@@ -10,6 +10,7 @@ import {
   updateCar,
 } from '../data/cars'
 import type { BodyType, Car, Dealer } from '../data/types'
+import { ListingImagesField } from './ListingImagesField'
 
 type Ctx = { session: AuthSession; dealer?: Dealer }
 
@@ -32,6 +33,7 @@ type Draft = {
   featured: boolean
   description: string
   featuresText: string
+  images: string[]
 }
 
 function draftFromCar(car: Car): Draft {
@@ -51,6 +53,7 @@ function draftFromCar(car: Car): Draft {
     featured: car.featured,
     description: car.description,
     featuresText: car.features.join(', '),
+    images: [...car.images],
   }
 }
 
@@ -71,6 +74,7 @@ function emptyDraft(dealer?: Dealer, cityFallback = 'Nairobi'): Draft {
     featured: false,
     description: '',
     featuresText: '',
+    images: [],
   }
 }
 
@@ -132,6 +136,11 @@ export function DealerInventory() {
       .map((f) => f.trim())
       .filter(Boolean)
 
+    if (draft.images.length === 0) {
+      flash('Add at least one photo')
+      return
+    }
+
     if (mode === 'edit' && editingId) {
       updateCar(editingId, dealerId, {
         make: draft.make,
@@ -149,6 +158,7 @@ export function DealerInventory() {
         featured: draft.featured,
         description: draft.description,
         features,
+        images: draft.images,
       })
       flash('Listing updated')
     } else {
@@ -169,6 +179,7 @@ export function DealerInventory() {
         featured: draft.featured,
         description: draft.description,
         features,
+        images: draft.images,
       })
       flash('Listing published')
     }
@@ -372,6 +383,12 @@ export function DealerInventory() {
                 placeholder="Sunroof, Reverse camera, Leather seats"
               />
             </div>
+
+            <ListingImagesField
+              images={draft.images}
+              onChange={(images) => patchDraft('images', images)}
+              label="Car photos"
+            />
 
             <label className="check-row" style={{ marginTop: '0.85rem' }}>
               <input

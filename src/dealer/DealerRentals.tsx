@@ -10,6 +10,7 @@ import {
   updateRental,
 } from '../data/rentals'
 import type { BodyType, Dealer, RentalCar } from '../data/types'
+import { ListingImagesField } from './ListingImagesField'
 
 type Ctx = { session: AuthSession; dealer?: Dealer }
 
@@ -34,6 +35,7 @@ type Draft = {
   available: boolean
   description: string
   includesText: string
+  images: string[]
 }
 
 function draftFromRental(car: RentalCar): Draft {
@@ -56,6 +58,7 @@ function draftFromRental(car: RentalCar): Draft {
     available: car.available,
     description: car.description,
     includesText: car.includes.join(', '),
+    images: [...car.images],
   }
 }
 
@@ -79,6 +82,7 @@ function emptyDraft(dealer?: Dealer, cityFallback = 'Nairobi'): Draft {
     available: true,
     description: '',
     includesText: 'Comprehensive insurance, Kenya Vehicles booking',
+    images: [],
   }
 }
 
@@ -135,6 +139,10 @@ export function DealerRentals() {
   function onSave(e: FormEvent) {
     e.preventDefault()
     if (!dealerId || !draft.model.trim()) return
+    if (draft.images.length === 0) {
+      flash('Add at least one photo')
+      return
+    }
     const includes = draft.includesText
       .split(',')
       .map((item) => item.trim())
@@ -160,6 +168,7 @@ export function DealerRentals() {
         available: draft.available,
         description: draft.description,
         includes,
+        images: draft.images,
       })
       flash('Hire listing updated')
     } else {
@@ -185,6 +194,7 @@ export function DealerRentals() {
           draft.description.trim() ||
           `${draft.year} ${draft.make} ${draft.model} for hire from ${dealer?.name ?? session.name}.`,
         includes,
+        images: draft.images,
       })
       flash('Hire car listed on Kenya Vehicles')
     }
@@ -390,6 +400,12 @@ export function DealerRentals() {
                 placeholder="Insurance, Airport pickup, GPS"
               />
             </div>
+
+            <ListingImagesField
+              images={draft.images}
+              onChange={(images) => patchDraft('images', images)}
+              label="Hire car photos"
+            />
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '0.85rem' }}>
               <label className="check-row">
