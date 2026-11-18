@@ -135,6 +135,9 @@ export function LenderOverview() {
             <Link to="/lender/applications" className="admin-btn admin-btn-primary">
               Review applications{newCount > 0 ? ` (${newCount} new)` : ''}
             </Link>
+            <Link to="/lender/analytics" className="admin-btn admin-btn-ghost">
+              View analysis
+            </Link>
             <Link to="/lender/profile" className="admin-btn admin-btn-ghost">
               Edit partner profile
             </Link>

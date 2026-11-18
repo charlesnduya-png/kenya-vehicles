@@ -16,6 +16,7 @@ const groups = [
     items: [
       { to: '/lender', label: 'Overview', end: true, icon: 'grid' },
       { to: '/lender/applications', label: 'Applications', icon: 'inbox' },
+      { to: '/lender/analytics', label: 'Analysis', icon: 'chart' },
     ],
   },
   {
@@ -27,6 +28,7 @@ const groups = [
 const titles: Record<string, { eyebrow: string; title: string }> = {
   '/lender': { eyebrow: 'Loan agent portal', title: 'Partner overview' },
   '/lender/applications': { eyebrow: 'Pipeline', title: 'Loan applications' },
+  '/lender/analytics': { eyebrow: 'Insights', title: 'Loan analysis' },
   '/lender/profile': { eyebrow: 'Account', title: 'Partner profile' },
 }
 
@@ -57,6 +59,16 @@ function NavIcon({ name }: { name: string }) {
         <svg {...common}>
           <path d="M4 13h4l2 3h4l2-3h4v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5z" />
           <path d="M4 13l2.5-7h11L20 13" />
+        </svg>
+      )
+    case 'chart':
+      return (
+        <svg {...common}>
+          <path d="M4 19V5" />
+          <path d="M4 19h16" />
+          <path d="M8 17V10" />
+          <path d="M13 17V7" />
+          <path d="M18 17v-4" />
         </svg>
       )
     default:

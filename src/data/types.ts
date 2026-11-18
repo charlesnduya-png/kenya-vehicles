@@ -54,6 +54,10 @@ export interface LoanPartner {
   logoColor: string
   rating: number
   reviewCount: number
+  /** Contact shown to dealers so yards can call the loan agent */
+  phone: string
+  email: string
+  contactName?: string
   /** Optional partner logo (data URL or hosted image) */
   logo?: string
 }

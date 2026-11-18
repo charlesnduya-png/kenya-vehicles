@@ -6,6 +6,7 @@ import {
   getLoanPartner,
   setLoanPartnerLogo,
   subscribeLoanPartners,
+  updateLoanPartnerContact,
   updateLoanPartnerRating,
   updateLoanPartnerTerms,
 } from '../data/loans'
@@ -30,10 +31,14 @@ export function LenderProfile() {
   const [maxLoan, setMaxLoan] = useState(String(partner?.maxLoan ?? 5000000))
   const [maxTerm, setMaxTerm] = useState(String(partner?.maxTermMonths ?? 48))
   const [highlight, setHighlight] = useState(partner?.highlight ?? '')
+  const [phone, setPhone] = useState(partner?.phone ?? '')
+  const [email, setEmail] = useState(partner?.email ?? '')
+  const [contactName, setContactName] = useState(partner?.contactName ?? '')
   const [toast, setToast] = useState('')
   const [error, setError] = useState('')
   const [ratingError, setRatingError] = useState('')
   const [termsError, setTermsError] = useState('')
+  const [contactError, setContactError] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   function syncFromPartner(next?: LoanPartner) {
@@ -47,6 +52,9 @@ export function LenderProfile() {
     setMaxLoan(String(next?.maxLoan ?? 5000000))
     setMaxTerm(String(next?.maxTermMonths ?? 48))
     setHighlight(next?.highlight ?? '')
+    setPhone(next?.phone ?? '')
+    setEmail(next?.email ?? '')
+    setContactName(next?.contactName ?? '')
   }
 
   useEffect(() => {
@@ -156,6 +164,22 @@ export function LenderProfile() {
     flash('Loan terms updated — live on the public loans page')
   }
 
+  function onSaveContact(e: FormEvent) {
+    e.preventDefault()
+    if (!partner) return
+    setContactError('')
+    if (!phone.trim() || !email.trim()) {
+      setContactError('Phone and email are required so dealers can reach you.')
+      return
+    }
+    updateLoanPartnerContact(partner.id, {
+      phone,
+      email,
+      contactName,
+    })
+    flash('Contact details updated — dealers can call you from enquiries')
+  }
+
   return (
     <>
       {toast && <div className="admin-toast">{toast}</div>}
@@ -164,7 +188,7 @@ export function LenderProfile() {
         <div>
           <h2>Partner profile</h2>
           <p style={{ margin: '0.2rem 0 0', color: '#64748b', fontSize: '0.85rem' }}>
-            Edit logo, rating, interest rates, deposit, and loan limits shown to buyers
+            Edit logo, contact for dealers, rates, deposit, and loan limits
           </p>
         </div>
         <Link to="/loans" className="admin-btn admin-btn-ghost" target="_blank">
@@ -331,6 +355,61 @@ export function LenderProfile() {
       <section className="admin-panel" style={{ marginBottom: '1rem' }}>
         <div className="admin-panel-head">
           <div>
+            <h2>Dealer contact details</h2>
+            <p>Shown on yard loan enquiries so dealers can call or email your desk</p>
+          </div>
+        </div>
+        <form onSubmit={onSaveContact} style={{ padding: '0 1.2rem 1.2rem' }}>
+          <div className="grid-2">
+            <div className="field">
+              <label htmlFor="contact-name">Desk / agent name</label>
+              <input
+                id="contact-name"
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                disabled={!partner}
+                placeholder="Auto loans desk"
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="contact-phone">Phone</label>
+              <input
+                id="contact-phone"
+                required
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                disabled={!partner}
+                placeholder="+254 7.."
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="contact-email">Email</label>
+              <input
+                id="contact-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={!partner}
+                placeholder="loans@partner.co.ke"
+              />
+            </div>
+          </div>
+          {contactError && <p className="dealer-logo-error">{contactError}</p>}
+          <button
+            type="submit"
+            className="admin-btn admin-btn-primary"
+            style={{ marginTop: '0.85rem' }}
+            disabled={!partner}
+          >
+            Save contact details
+          </button>
+        </form>
+      </section>
+
+      <section className="admin-panel" style={{ marginBottom: '1rem' }}>
+        <div className="admin-panel-head">
+          <div>
             <h2>Public rating</h2>
             <p>Edit the star rating and review count shown to buyers</p>
           </div>
@@ -414,6 +493,13 @@ export function LenderProfile() {
             <div>
               <dt style={{ color: '#64748b', fontSize: '0.8rem' }}>Cities</dt>
               <dd style={{ margin: '0.2rem 0 0' }}>{partner.cities.join(' · ')}</dd>
+            </div>
+            <div>
+              <dt style={{ color: '#64748b', fontSize: '0.8rem' }}>Dealer contact</dt>
+              <dd style={{ margin: '0.2rem 0 0' }}>
+                {partner.contactName ? `${partner.contactName} · ` : ''}
+                {partner.phone} · {partner.email}
+              </dd>
             </div>
           </dl>
         ) : (

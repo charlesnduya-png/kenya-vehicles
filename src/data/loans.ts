@@ -15,6 +15,9 @@ export const loanPartners: LoanPartner[] = [
     logoColor: '#a31c44',
     rating: 4.8,
     reviewCount: 186,
+    phone: '+254 763 000 111',
+    email: 'auto@equitybank.co.ke',
+    contactName: 'Equity Auto desk',
   },
   {
     id: 'l2',
@@ -30,6 +33,9 @@ export const loanPartners: LoanPartner[] = [
     logoColor: '#0b6e4f',
     rating: 4.7,
     reviewCount: 142,
+    phone: '+254 711 012 000',
+    email: 'drive@kcbgroup.com',
+    contactName: 'KCB Drive desk',
   },
   {
     id: 'l3',
@@ -45,6 +51,9 @@ export const loanPartners: LoanPartner[] = [
     logoColor: '#1d3557',
     rating: 4.6,
     reviewCount: 97,
+    phone: '+254 709 663 000',
+    email: 'auto@stimasacco.com',
+    contactName: 'Stima Auto loans',
   },
   {
     id: 'l4',
@@ -60,6 +69,9 @@ export const loanPartners: LoanPartner[] = [
     logoColor: '#b8f200',
     rating: 4.4,
     reviewCount: 73,
+    phone: '+254 790 222 333',
+    email: 'partners@carfin.ke',
+    contactName: 'CarFin partners',
   },
   {
     id: 'l5',
@@ -75,6 +87,9 @@ export const loanPartners: LoanPartner[] = [
     logoColor: '#e85d04',
     rating: 4.3,
     reviewCount: 58,
+    phone: '+254 711 067 000',
+    email: 'assets@faulu.co.ke',
+    contactName: 'Faulu asset desk',
   },
   {
     id: 'l6',
@@ -90,6 +105,9 @@ export const loanPartners: LoanPartner[] = [
     logoColor: '#0077b6',
     rating: 4.5,
     reviewCount: 111,
+    phone: '+254 703 027 000',
+    email: 'motari@co-opbank.co.ke',
+    contactName: 'Motari desk',
   },
 ]
 
@@ -106,6 +124,9 @@ type StoredProfile = {
   maxLoan?: number
   maxTermMonths?: number
   highlight?: string
+  phone?: string
+  email?: string
+  contactName?: string
 }
 
 function readStoredLogos(): Record<string, string> {
@@ -142,6 +163,9 @@ function hydratePartners() {
     if (profile.maxLoan != null) partner.maxLoan = profile.maxLoan
     if (profile.maxTermMonths != null) partner.maxTermMonths = profile.maxTermMonths
     if (profile.highlight != null) partner.highlight = profile.highlight
+    if (profile.phone != null) partner.phone = profile.phone
+    if (profile.email != null) partner.email = profile.email
+    if (profile.contactName != null) partner.contactName = profile.contactName
   }
 }
 
@@ -234,6 +258,24 @@ export function updateLoanPartnerTerms(
     maxLoan: partner.maxLoan,
     maxTermMonths: partner.maxTermMonths,
     highlight: partner.highlight,
+  })
+}
+
+export function updateLoanPartnerContact(
+  partnerId: string,
+  contact: { phone: string; email: string; contactName?: string },
+) {
+  const partner = loanPartners.find((p) => p.id === partnerId)
+  if (!partner) return
+
+  partner.phone = contact.phone.trim() || partner.phone
+  partner.email = contact.email.trim() || partner.email
+  partner.contactName = contact.contactName?.trim() || partner.contactName
+
+  saveProfile(partnerId, {
+    phone: partner.phone,
+    email: partner.email,
+    contactName: partner.contactName,
   })
 }
 

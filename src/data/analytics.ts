@@ -153,6 +153,70 @@ export function getLeadingLenders(limit = 6): LenderLeader[] {
     .slice(0, limit)
 }
 
+export function getLenderOwnAnalytics(loanPartnerId: string) {
+  const apps = liveEnquiries().filter(
+    (e) => e.type === 'Loan' && e.loanPartnerId === loanPartnerId,
+  )
+  const byStatus = {
+    newCount: apps.filter((e) => e.status === 'New').length,
+    replied: apps.filter((e) => e.status === 'Replied').length,
+    accepted: apps.filter((e) => e.status === 'Accepted').length,
+    declined: apps.filter((e) => e.status === 'Declined').length,
+    closed: apps.filter((e) => e.status === 'Closed').length,
+  }
+  const estimatedMonthlyVolume = apps.reduce((sum, e) => sum + (e.estimatedMonthly ?? 0), 0)
+  const financedValue = apps
+    .filter((e) => e.status === 'Accepted')
+    .reduce((sum, e) => sum + (e.carPrice ?? 0), 0)
+
+  const yardMap = new Map<
+    string,
+    { dealerId: string; dealerName: string; count: number; accepted: number }
+  >()
+  for (const app of apps) {
+    const key = app.dealerId
+    const prev = yardMap.get(key) ?? {
+      dealerId: app.dealerId,
+      dealerName: app.dealerName,
+      count: 0,
+      accepted: 0,
+    }
+    prev.count += 1
+    if (app.status === 'Accepted') prev.accepted += 1
+    yardMap.set(key, prev)
+  }
+  const topYards = [...yardMap.values()].sort((a, b) => b.count - a.count).slice(0, 6)
+
+  const unitMap = new Map<string, { label: string; carId?: string; count: number; price?: number }>()
+  for (const app of apps) {
+    const key = app.carId ?? app.carLabel
+    const prev = unitMap.get(key) ?? {
+      label: app.carLabel,
+      carId: app.carId,
+      count: 0,
+      price: app.carPrice,
+    }
+    prev.count += 1
+    unitMap.set(key, prev)
+  }
+  const topUnits = [...unitMap.values()].sort((a, b) => b.count - a.count).slice(0, 6)
+
+  const acceptanceRate =
+    byStatus.accepted + byStatus.declined > 0
+      ? Math.round((byStatus.accepted / (byStatus.accepted + byStatus.declined)) * 100)
+      : 0
+
+  return {
+    total: apps.length,
+    ...byStatus,
+    estimatedMonthlyVolume,
+    financedValue,
+    acceptanceRate,
+    topYards,
+    topUnits,
+  }
+}
+
 export function formatAnalyticsKES(value: number) {
   if (!value) return formatKES(0)
   return formatKES(Math.round(value))

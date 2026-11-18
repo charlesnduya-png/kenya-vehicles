@@ -20,6 +20,7 @@ import { DealerOverview } from './dealer/DealerOverview'
 import { DealerProfile } from './dealer/DealerProfile'
 import { DealerRentals } from './dealer/DealerRentals'
 import { DealerSubscription } from './dealer/DealerSubscription'
+import { LenderAnalytics } from './lender/LenderAnalytics'
 import { LenderApplications } from './lender/LenderApplications'
 import { LenderLayout } from './lender/LenderLayout'
 import { LenderOverview } from './lender/LenderOverview'
@@ -71,6 +72,7 @@ export default function App() {
         <Route path="lender" element={<LenderLayout />}>
           <Route index element={<LenderOverview />} />
           <Route path="applications" element={<LenderApplications />} />
+          <Route path="analytics" element={<LenderAnalytics />} />
           <Route path="profile" element={<LenderProfile />} />
         </Route>
 

@@ -10,6 +10,7 @@ import {
   type EnquiryType,
   type YardEnquiry,
 } from '../data/enquiries'
+import { getLoanPartner } from '../data/loans'
 import type { Dealer } from '../data/types'
 
 type Ctx = { session: AuthSession; dealer?: Dealer }
@@ -145,6 +146,45 @@ export function DealerEnquiries() {
                               ` · ~${formatKES(Math.round(row.estimatedMonthly))}/mo`}
                           </div>
                         )}
+                        {(() => {
+                          const agent = row.loanPartnerId
+                            ? getLoanPartner(row.loanPartnerId)
+                            : undefined
+                          if (!agent) return null
+                          return (
+                            <div
+                              style={{
+                                marginTop: '0.45rem',
+                                padding: '0.55rem 0.65rem',
+                                borderRadius: 8,
+                                background: '#f0f9ff',
+                                border: '1px solid #bae6fd',
+                                color: '#0c4a6e',
+                              }}
+                            >
+                              <div style={{ fontWeight: 800, marginBottom: '0.2rem' }}>
+                                Loan agent contact
+                              </div>
+                              {agent.contactName && <div>{agent.contactName}</div>}
+                              <div style={{ marginTop: '0.35rem', display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
+                                <a
+                                  href={`tel:${agent.phone.replace(/\s/g, '')}`}
+                                  className="admin-btn admin-btn-primary"
+                                  style={{ textDecoration: 'none' }}
+                                >
+                                  Call {agent.phone}
+                                </a>
+                                <a
+                                  href={`mailto:${agent.email}`}
+                                  className="admin-btn admin-btn-ghost"
+                                  style={{ textDecoration: 'none' }}
+                                >
+                                  Email {agent.email}
+                                </a>
+                              </div>
+                            </div>
+                          )
+                        })()}
                         {row.status === 'Accepted' && (
                           <div
                             style={{
