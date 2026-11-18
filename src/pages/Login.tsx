@@ -67,6 +67,9 @@ export function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <p className="login-forgot">
+                <Link to="/forgot-password">Forgot password?</Link>
+              </p>
             </div>
             {error && <p className="login-error">{error}</p>}
             <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>

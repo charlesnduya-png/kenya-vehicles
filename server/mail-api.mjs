@@ -168,20 +168,28 @@ app.post('/api/auth/send-code', async (req, res) => {
       attempts: 0,
     })
 
+    const isReset = purpose.startsWith('reset')
+    const subject = isReset
+      ? `${code} is your Kenya Vehicles password reset code`
+      : `${code} is your Kenya Vehicles verification code`
+    const intro = isReset
+      ? 'Use this code to reset your Kenya Vehicles password:'
+      : 'Your Kenya Vehicles verification code is:'
+
     const transporter = getTransporter()
     await transporter.sendMail({
       from: `"${FROM_NAME}" <${GMAIL_USER}>`,
       to: email,
-      subject: `${code} is your Kenya Vehicles verification code`,
+      subject,
       text: [
-        `Your Kenya Vehicles verification code is: ${code}`,
+        intro.replace(':', ` ${code}`),
         '',
         'This code expires in 10 minutes.',
         'If you did not request this, you can ignore this email.',
       ].join('\n'),
       html: `
         <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111">
-          <p>Your Kenya Vehicles verification code is:</p>
+          <p>${intro}</p>
           <p style="font-size:28px;font-weight:800;letter-spacing:4px">${code}</p>
           <p>This code expires in 10 minutes.</p>
           <p style="color:#666">If you did not request this, you can ignore this email.</p>
@@ -189,7 +197,10 @@ app.post('/api/auth/send-code', async (req, res) => {
       `,
     })
 
-    return res.json({ ok: true, message: 'Verification code sent.' })
+    return res.json({
+      ok: true,
+      message: isReset ? 'Password reset code sent.' : 'Verification code sent.',
+    })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Could not send verification email.'
     console.error('[api] send-code failed:', message)

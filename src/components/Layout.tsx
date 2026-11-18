@@ -14,6 +14,7 @@ const pageTitles: Record<string, string> = {
   '/pricing': `Pricing | ${SITE_TITLE}`,
   '/join': `Sell on Kenya Vehicles | ${SITE_TITLE}`,
   '/login': `Sign in | Kenya Vehicles`,
+  '/forgot-password': `Reset password | Kenya Vehicles`,
   '/about': `About | ${SITE_TITLE}`,
   '/architecture': `Platform | Kenya Vehicles`,
   '/messages': `Messages | Kenya Vehicles`,

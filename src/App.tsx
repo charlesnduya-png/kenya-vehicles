@@ -36,6 +36,7 @@ import { Dealers } from './pages/Dealers'
 import { About } from './pages/About'
 import { Architecture } from './pages/Architecture'
 import { Home } from './pages/Home'
+import { ForgotPassword } from './pages/ForgotPassword'
 import { Join } from './pages/Join'
 import { Loans } from './pages/Loans'
 import { Login } from './pages/Login'
@@ -98,6 +99,7 @@ export default function App() {
           <Route path="report" element={<ReportAccount />} />
           <Route path="messages" element={<Messages />} />
           <Route path="login" element={<Login />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

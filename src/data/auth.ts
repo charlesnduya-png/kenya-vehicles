@@ -1,7 +1,12 @@
 import { adminAccounts, type AccountRole, type AdminAccount } from './admin'
 import { dealers } from './dealers'
 import { loanPartners } from './loans'
-import { getAccountPassword, hydrateRegisteredPartners } from './partnerRegistry'
+import {
+  findAccountByEmail,
+  getAccountPassword,
+  hydrateRegisteredPartners,
+  setAccountPassword,
+} from './partnerRegistry'
 
 export type AuthSession = {
   accountId: string
@@ -50,8 +55,27 @@ export function logout() {
 }
 
 function passwordForAccount(account: AdminAccount) {
+  const stored = getAccountPassword(account.email)
+  if (stored) return stored
   if (account.role === 'Admin') return ADMIN_PASSWORD
-  return getAccountPassword(account.email)
+  return null
+}
+
+/** Reset password after email code verification (dealers, lenders, admin). */
+export function resetAccountPassword(email: string, newPassword: string) {
+  hydrateRegisteredPartners()
+  const account = findAccountByEmail(email)
+  if (!account) {
+    return { ok: false as const, error: 'No account found for that email.' }
+  }
+  if (account.status === 'Suspended') {
+    return { ok: false as const, error: 'This account is suspended.' }
+  }
+  if (newPassword.trim().length < 8) {
+    return { ok: false as const, error: 'Password must be at least 8 characters.' }
+  }
+  setAccountPassword(account.email, newPassword)
+  return { ok: true as const, account }
 }
 
 export function loginWithEmail(email: string, password: string) {
