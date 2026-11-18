@@ -144,6 +144,55 @@ export function LenderOverview() {
           </div>
         </section>
       </div>
+
+      {apps.length > 0 && (
+        <section className="admin-panel" style={{ marginTop: '1rem' }}>
+          <div className="admin-panel-head">
+            <div>
+              <h2>Recent units inquired</h2>
+              <p>Cars buyers asked to finance with you</p>
+            </div>
+            <Link to="/lender/applications" className="admin-btn admin-btn-ghost">
+              Open all
+            </Link>
+          </div>
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Unit</th>
+                  <th>Buyer</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {apps.slice(0, 5).map((row) => (
+                  <tr key={row.id}>
+                    <td>
+                      <strong>{row.carLabel}</strong>
+                      <div style={{ color: '#64748b', fontSize: '0.8rem' }}>{row.dealerName}</div>
+                    </td>
+                    <td>{row.customerName}</td>
+                    <td className="mono">
+                      {row.carPrice != null ? formatKES(row.carPrice) : '—'}
+                    </td>
+                    <td>
+                      <span className="admin-pill muted">{row.status}</span>
+                    </td>
+                    <td>
+                      <Link to="/lender/applications" className="admin-btn admin-btn-ghost">
+                        View unit
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
     </>
   )
 }

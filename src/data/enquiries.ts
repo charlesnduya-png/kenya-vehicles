@@ -8,6 +8,13 @@ export type YardEnquiry = {
   dealerName: string
   carId?: string
   carLabel: string
+  /** Snapshot so loan agents can still see the unit later */
+  carImage?: string
+  carYear?: number
+  carMake?: string
+  carModel?: string
+  carMileage?: number
+  carCity?: string
   customerName: string
   customerPhone: string
   customerEmail?: string
