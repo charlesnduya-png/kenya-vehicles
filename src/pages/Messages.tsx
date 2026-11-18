@@ -22,18 +22,34 @@ export function Messages() {
   const [lookupPhone, setLookupPhone] = useState(identity?.phone ?? '')
   const [lookupName, setLookupName] = useState(identity?.name ?? '')
   const [lookupEmail, setLookupEmail] = useState(identity?.email ?? '')
+  const [showClaim, setShowClaim] = useState(() => !getCustomerIdentity())
 
   useEffect(() => {
     return subscribeMessages(() => {
       const id = getCustomerIdentity()
       setIdentity(id)
       setThreads(id ? getThreadsForCustomer(id.phone) : [])
+      if (id) setShowClaim(false)
     })
   }, [])
 
   useEffect(() => {
     const fromUrl = params.get('thread')
-    if (fromUrl) setActiveId(fromUrl)
+    if (!fromUrl) return
+    setActiveId(fromUrl)
+    const thread = getThread(fromUrl)
+    if (!thread) return
+    if (!getCustomerIdentity()) {
+      const next = {
+        name: thread.customerName,
+        phone: thread.customerPhone,
+        email: thread.customerEmail,
+      }
+      setCustomerIdentity(next)
+      setIdentity(next)
+      setThreads(getThreadsForCustomer(next.phone))
+      setShowClaim(false)
+    }
   }, [params])
 
   const active = useMemo(() => {
@@ -52,6 +68,7 @@ export function Messages() {
     setCustomerIdentity(next)
     setIdentity(next)
     setThreads(getThreadsForCustomer(next.phone))
+    setShowClaim(false)
   }
 
   function sendReply(e: FormEvent) {
@@ -63,25 +80,48 @@ export function Messages() {
     setParams({ thread: active.id })
   }
 
-  if (!identity) {
-    return (
-      <section className="section messages-page">
-        <div className="container messages-claim">
-          <p className="eyebrow">Inbox</p>
-          <h1>Your messages</h1>
-          <p>Enter the phone number you used when messaging a dealer to open your inbox.</p>
-          <form className="panel-card messages-claim-form" onSubmit={claimInbox}>
-            <div className="field">
-              <label htmlFor="claim-phone">Phone</label>
-              <input
-                id="claim-phone"
-                required
-                value={lookupPhone}
-                onChange={(e) => setLookupPhone(e.target.value)}
-                placeholder="+254 7.."
-              />
+  return (
+    <section className="section messages-page">
+      <div className="container">
+        <div className="messages-head">
+          <div>
+            <p className="eyebrow">Inbox</p>
+            <h1>Messages</h1>
+            <p>
+              {identity
+                ? `Chatting as ${identity.name} · ${identity.phone}`
+                : 'No sign-in needed — message dealers from any car page, or open an inbox with your phone.'}
+            </p>
+          </div>
+          <div className="messages-head-actions">
+            {identity && !showClaim && (
+              <button type="button" className="btn btn-ghost" onClick={() => setShowClaim(true)}>
+                Switch phone
+              </button>
+            )}
+            <Link to="/cars" className="btn btn-ghost">
+              Browse cars
+            </Link>
+          </div>
+        </div>
+
+        {(showClaim || !identity) && (
+          <form className="panel-card messages-claim-form messages-claim-inline" onSubmit={claimInbox}>
+            <div>
+              <strong>Open your inbox</strong>
+              <p>Use the phone number you gave when messaging a dealer. No account login required.</p>
             </div>
             <div className="grid-2">
+              <div className="field">
+                <label htmlFor="claim-phone">Phone</label>
+                <input
+                  id="claim-phone"
+                  required
+                  value={lookupPhone}
+                  onChange={(e) => setLookupPhone(e.target.value)}
+                  placeholder="+254 7.."
+                />
+              </div>
               <div className="field">
                 <label htmlFor="claim-name">Name</label>
                 <input
@@ -91,46 +131,38 @@ export function Messages() {
                   placeholder="Jane Wanjiku"
                 />
               </div>
-              <div className="field">
-                <label htmlFor="claim-email">Email</label>
-                <input
-                  id="claim-email"
-                  type="email"
-                  value={lookupEmail}
-                  onChange={(e) => setLookupEmail(e.target.value)}
-                  placeholder="you@email.com"
-                />
-              </div>
             </div>
-            <button type="submit" className="btn btn-primary">
-              Open inbox
-            </button>
+            <div className="field">
+              <label htmlFor="claim-email">Email</label>
+              <input
+                id="claim-email"
+                type="email"
+                value={lookupEmail}
+                onChange={(e) => setLookupEmail(e.target.value)}
+                placeholder="you@email.com"
+              />
+            </div>
+            <div className="messages-claim-actions">
+              <button type="submit" className="btn btn-primary">
+                Open inbox
+              </button>
+              {identity && (
+                <button type="button" className="btn btn-ghost" onClick={() => setShowClaim(false)}>
+                  Cancel
+                </button>
+              )}
+            </div>
           </form>
-        </div>
-      </section>
-    )
-  }
-
-  return (
-    <section className="section messages-page">
-      <div className="container">
-        <div className="messages-head">
-          <div>
-            <p className="eyebrow">Inbox</p>
-            <h1>Messages</h1>
-            <p>
-              Chatting as {identity.name} · {identity.phone}
-            </p>
-          </div>
-          <Link to="/cars" className="btn btn-ghost">
-            Browse cars
-          </Link>
-        </div>
+        )}
 
         <div className="messages-shell panel-card">
           <aside className="messages-list">
             {threads.length === 0 && (
-              <div className="messages-empty">No conversations yet. Message a dealer from a car page.</div>
+              <div className="messages-empty">
+                No conversations yet.{' '}
+                <Link to="/cars">Browse cars</Link> and tap <strong>Message dealer</strong> — no login
+                needed.
+              </div>
             )}
             {threads.map((thread) => (
               <button

@@ -7,6 +7,28 @@
   margin-bottom: 1rem;
 }
 
+.messages-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.messages-claim-inline {
+  margin-bottom: 1rem;
+}
+
+.messages-claim-inline > div:first-child p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.messages-claim-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .messages-head h1 {
   margin: 0.15rem 0 0.25rem;
 }

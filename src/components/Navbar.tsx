@@ -114,16 +114,19 @@ export function Navbar() {
             <strong>{accountLabel}</strong>
           </Link>
 
-          <Link to="/messages" className="amz-account amz-account-notify">
-            <span>Your</span>
-            <strong>
-              Messages
-              {messageBadge > 0 && (
-                <em className="amz-notify-badge" aria-label={`${messageBadge} unread`}>
-                  {formatBadgeCount(messageBadge)}
-                </em>
-              )}
-            </strong>
+          <Link to="/messages" className="amz-messages" aria-label="Messages">
+            <span className="amz-messages-label">
+              <span>Your</span>
+              <strong>Messages</strong>
+            </span>
+            <span className="amz-messages-icon" aria-hidden="true">
+              💬
+            </span>
+            {messageBadge > 0 && (
+              <em className="amz-notify-badge" aria-label={`${messageBadge} unread`}>
+                {formatBadgeCount(messageBadge)}
+              </em>
+            )}
           </Link>
 
           <Link to="/loans" className="amz-account">
