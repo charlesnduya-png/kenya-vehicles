@@ -12,7 +12,7 @@ import {
   getLeadingDealers,
   getLeadingLenders,
 } from '../data/analytics'
-import { cars, formatKES } from '../data/cars'
+import { formatKES, getCars } from '../data/cars'
 import { dealers } from '../data/dealers'
 import { subscribeEnquiries } from '../data/enquiries'
 import { loanPartners } from '../data/loans'
@@ -21,12 +21,13 @@ import { dealersWithRentals, getRentals } from '../data/rentals'
 
 export function AdminOverview() {
   const [tick, setTick] = useState(0)
-  const liveListings = cars.length
+  const saleStock = getCars()
+  const liveListings = saleStock.length
   const fleet = getRentals()
   const liveRentals = fleet.filter((r) => r.available).length
   const activeAccounts = adminAccounts.filter((a) => a.status === 'Active').length
   const openEnquiries = adminEnquiries.filter((e) => e.status !== 'Closed').length
-  const inventoryValue = cars.reduce((sum, c) => sum + c.price, 0)
+  const inventoryValue = saleStock.reduce((sum, c) => sum + c.price, 0)
   const maxBar = Math.max(...monthlyStats.flatMap((m) => [m.sales, m.hires, m.loans]))
 
   useEffect(() => {

@@ -1,25 +1,28 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { VerifiedBadge } from '../components/VerifiedBadge'
-import { cars, formatKES, formatMileage } from '../data/cars'
+import { formatKES, formatMileage, getCars, subscribeCars } from '../data/cars'
 import { getDealer } from '../data/dealers'
 
 export function AdminCars() {
   const [q, setQ] = useState('')
   const [city, setCity] = useState('All')
+  const [stock, setStock] = useState(() => getCars())
+
+  useEffect(() => subscribeCars(() => setStock(getCars())), [])
 
   const cities = useMemo(
-    () => ['All', ...Array.from(new Set(cars.map((c) => c.city)))],
-    [],
+    () => ['All', ...Array.from(new Set(stock.map((c) => c.city)))],
+    [stock],
   )
 
   const filtered = useMemo(() => {
-    return cars.filter((car) => {
+    return stock.filter((car) => {
       const dealer = getDealer(car.dealerId)
       const hay = `${car.make} ${car.model} ${dealer?.name ?? ''} ${car.city}`.toLowerCase()
       return (!q || hay.includes(q.toLowerCase())) && (city === 'All' || car.city === city)
     })
-  }, [q, city])
+  }, [stock, q, city])
 
   return (
     <>

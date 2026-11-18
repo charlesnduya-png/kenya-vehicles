@@ -1,5 +1,5 @@
 import { adminEnquiries } from './admin'
-import { cars, formatKES } from './cars'
+import { formatKES, getCars } from './cars'
 import { dealers } from './dealers'
 import { getEnquiries, type YardEnquiry } from './enquiries'
 import { loanPartners } from './loans'
@@ -78,7 +78,7 @@ export function getLeadingDealers(limit = 6): DealerLeader[] {
 
   return dealers
     .map((dealer) => {
-      const stock = cars.filter((c) => c.dealerId === dealer.id)
+      const stock = getCars().filter((c) => c.dealerId === dealer.id)
       const dealerEnquiries = enquiries.filter((e) => e.dealerId === dealer.id)
       const saleEnquiries = dealerEnquiries.filter((e) => e.type === 'Car sale').length
       const loanEnquiries = dealerEnquiries.filter((e) => e.type === 'Loan').length

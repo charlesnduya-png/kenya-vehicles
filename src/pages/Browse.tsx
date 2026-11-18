@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { CarCard } from '../components/CarCard'
-import { cars } from '../data/cars'
+import { getCars, subscribeCars } from '../data/cars'
 import type { BodyType } from '../data/types'
 import './Browse.css'
 
@@ -22,6 +22,7 @@ export function Browse() {
   const [q, setQ] = useState(params.get('q') ?? '')
   const [county, setCounty] = useState(params.get('county') ?? 'All')
   const [bodyType, setBodyType] = useState<BodyType | 'All'>('All')
+  const [stock, setStock] = useState(() => getCars())
 
   useEffect(() => {
     setQ(params.get('q') ?? '')
@@ -29,11 +30,14 @@ export function Browse() {
     const body = (params.get('body') as BodyType | null) ?? 'All'
     setBodyType(bodyTypes.includes(body) ? body : 'All')
   }, [params])
+
+  useEffect(() => subscribeCars(() => setStock(getCars())), [])
+
   const [maxPrice, setMaxPrice] = useState(10000000)
   const [sort, setSort] = useState<'featured' | 'price-asc' | 'price-desc' | 'year-desc'>('featured')
 
   const filtered = useMemo(() => {
-    let list = cars.filter((car) => {
+    let list = stock.filter((car) => {
       const hay = `${car.make} ${car.model} ${car.city} ${car.condition}`.toLowerCase()
       const matchesQ = !q || hay.includes(q.toLowerCase())
       const matchesCounty = county === 'All' || car.county === county
@@ -50,7 +54,7 @@ export function Browse() {
     })
 
     return list
-  }, [q, county, bodyType, maxPrice, sort])
+  }, [stock, q, county, bodyType, maxPrice, sort])
 
   return (
     <section className="section browse">

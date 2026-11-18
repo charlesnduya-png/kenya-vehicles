@@ -1,14 +1,15 @@
 import { Link } from 'react-router-dom'
 import { CarCard } from '../components/CarCard'
 import { VerifiedBadge } from '../components/VerifiedBadge'
-import { cars } from '../data/cars'
+import { getCars } from '../data/cars'
 import { dealers } from '../data/dealers'
 import { loanPartners } from '../data/loans'
 import './Home.css'
 
 export function Home() {
-  const featured = cars.filter((c) => c.featured).slice(0, 6)
-  const budget = [...cars].sort((a, b) => a.price - b.price).slice(0, 6)
+  const stock = getCars()
+  const featured = stock.filter((c) => c.featured).slice(0, 6)
+  const budget = [...stock].sort((a, b) => a.price - b.price).slice(0, 6)
   const topDealers = dealers.filter((d) => d.verified).slice(0, 4)
 
   return (
