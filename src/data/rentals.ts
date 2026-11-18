@@ -284,6 +284,8 @@ export type NewRentalInput = {
   county: string
   withDriver: boolean
   selfDrive: boolean
+  featured?: boolean
+  available?: boolean
   description: string
   includes?: string[]
   images?: string[]
@@ -308,8 +310,8 @@ export function addRental(input: NewRentalInput) {
     county: input.county.trim(),
     withDriver: input.withDriver,
     selfDrive: input.selfDrive,
-    featured: false,
-    available: true,
+    featured: Boolean(input.featured),
+    available: input.available !== false,
     images:
       input.images && input.images.length > 0
         ? input.images
@@ -323,6 +325,32 @@ export function addRental(input: NewRentalInput) {
   }
   write([rental, ...list])
   return rental
+}
+
+export type RentalUpdate = Partial<Omit<RentalCar, 'id' | 'dealerId'>>
+
+export function updateRental(id: string, dealerId: string, patch: RentalUpdate) {
+  const list = read()
+  const idx = list.findIndex((r) => r.id === id && r.dealerId === dealerId)
+  if (idx < 0) return null
+  const current = list[idx]
+  const next: RentalCar = {
+    ...current,
+    ...patch,
+    id: current.id,
+    dealerId: current.dealerId,
+  }
+  if (typeof patch.make === 'string') next.make = patch.make.trim()
+  if (typeof patch.model === 'string') next.model = patch.model.trim()
+  if (typeof patch.description === 'string') next.description = patch.description.trim()
+  if (typeof patch.city === 'string') next.city = patch.city.trim()
+  if (typeof patch.county === 'string') next.county = patch.county.trim()
+  if (Array.isArray(patch.includes)) {
+    next.includes = patch.includes.map((item) => item.trim()).filter(Boolean)
+  }
+  list[idx] = next
+  write(list)
+  return next
 }
 
 export function setRentalAvailable(id: string, available: boolean) {

@@ -7,34 +7,90 @@ import {
   getRentalsByDealer,
   setRentalAvailable,
   subscribeRentals,
+  updateRental,
 } from '../data/rentals'
-import type { BodyType, Dealer } from '../data/types'
+import type { BodyType, Dealer, RentalCar } from '../data/types'
 
 type Ctx = { session: AuthSession; dealer?: Dealer }
 
 const bodies: BodyType[] = ['SUV', 'Sedan', 'Hatchback', 'Pickup', 'Van']
+
+type Draft = {
+  make: string
+  model: string
+  year: number
+  pricePerDay: number
+  pricePerWeek: number
+  deposit: number
+  transmission: RentalCar['transmission']
+  fuel: RentalCar['fuel']
+  bodyType: BodyType
+  seats: number
+  city: string
+  county: string
+  selfDrive: boolean
+  withDriver: boolean
+  featured: boolean
+  available: boolean
+  description: string
+  includesText: string
+}
+
+function draftFromRental(car: RentalCar): Draft {
+  return {
+    make: car.make,
+    model: car.model,
+    year: car.year,
+    pricePerDay: car.pricePerDay,
+    pricePerWeek: car.pricePerWeek,
+    deposit: car.deposit,
+    transmission: car.transmission,
+    fuel: car.fuel,
+    bodyType: car.bodyType,
+    seats: car.seats,
+    city: car.city,
+    county: car.county,
+    selfDrive: car.selfDrive,
+    withDriver: car.withDriver,
+    featured: car.featured,
+    available: car.available,
+    description: car.description,
+    includesText: car.includes.join(', '),
+  }
+}
+
+function emptyDraft(dealer?: Dealer, cityFallback = 'Nairobi'): Draft {
+  return {
+    make: 'Toyota',
+    model: '',
+    year: 2018,
+    pricePerDay: 5000,
+    pricePerWeek: 30000,
+    deposit: 25000,
+    transmission: 'Automatic',
+    fuel: 'Petrol',
+    bodyType: 'Sedan',
+    seats: 5,
+    city: dealer?.city ?? cityFallback,
+    county: dealer?.county ?? dealer?.city ?? cityFallback,
+    selfDrive: true,
+    withDriver: true,
+    featured: false,
+    available: true,
+    description: '',
+    includesText: 'Comprehensive insurance, Kenya Vehicles booking',
+  }
+}
 
 export function DealerRentals() {
   const { session, dealer } = useOutletContext<Ctx>()
   const dealerId = session.dealerId ?? ''
   const [q, setQ] = useState('')
   const [rows, setRows] = useState(() => (dealerId ? getRentalsByDealer(dealerId) : []))
-  const [showForm, setShowForm] = useState(false)
+  const [mode, setMode] = useState<'closed' | 'add' | 'edit'>('closed')
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [draft, setDraft] = useState<Draft>(() => emptyDraft(dealer, session.city))
   const [toast, setToast] = useState('')
-
-  const [make, setMake] = useState('Toyota')
-  const [model, setModel] = useState('')
-  const [year, setYear] = useState(2018)
-  const [pricePerDay, setPricePerDay] = useState(5000)
-  const [pricePerWeek, setPricePerWeek] = useState(30000)
-  const [deposit, setDeposit] = useState(25000)
-  const [transmission, setTransmission] = useState<'Automatic' | 'Manual'>('Automatic')
-  const [fuel, setFuel] = useState<'Petrol' | 'Diesel' | 'Hybrid' | 'Electric'>('Petrol')
-  const [bodyType, setBodyType] = useState<BodyType>('Sedan')
-  const [seats, setSeats] = useState(5)
-  const [selfDrive, setSelfDrive] = useState(true)
-  const [withDriver, setWithDriver] = useState(true)
-  const [description, setDescription] = useState('')
 
   useEffect(() => {
     if (!dealerId) return
@@ -55,33 +111,84 @@ export function DealerRentals() {
     window.setTimeout(() => setToast(''), 2600)
   }
 
-  function onAdd(e: FormEvent) {
+  function openAdd() {
+    setMode('add')
+    setEditingId(null)
+    setDraft(emptyDraft(dealer, session.city))
+  }
+
+  function openEdit(car: RentalCar) {
+    setMode('edit')
+    setEditingId(car.id)
+    setDraft(draftFromRental(car))
+  }
+
+  function closeForm() {
+    setMode('closed')
+    setEditingId(null)
+  }
+
+  function patchDraft<K extends keyof Draft>(key: K, value: Draft[K]) {
+    setDraft((d) => ({ ...d, [key]: value }))
+  }
+
+  function onSave(e: FormEvent) {
     e.preventDefault()
-    if (!dealerId || !model.trim()) return
-    addRental({
-      dealerId,
-      make,
-      model,
-      year,
-      pricePerDay,
-      pricePerWeek,
-      deposit,
-      transmission,
-      fuel,
-      bodyType,
-      seats,
-      city: dealer?.city ?? session.city,
-      county: dealer?.county ?? dealer?.city ?? session.city,
-      withDriver,
-      selfDrive,
-      description:
-        description.trim() ||
-        `${year} ${make} ${model} for hire from ${dealer?.name ?? session.name}.`,
-    })
-    setModel('')
-    setDescription('')
-    setShowForm(false)
-    flash('Hire car listed on Kenya Vehicles')
+    if (!dealerId || !draft.model.trim()) return
+    const includes = draft.includesText
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+
+    if (mode === 'edit' && editingId) {
+      updateRental(editingId, dealerId, {
+        make: draft.make,
+        model: draft.model,
+        year: draft.year,
+        pricePerDay: draft.pricePerDay,
+        pricePerWeek: draft.pricePerWeek,
+        deposit: draft.deposit,
+        transmission: draft.transmission,
+        fuel: draft.fuel,
+        bodyType: draft.bodyType,
+        seats: draft.seats,
+        city: draft.city,
+        county: draft.county,
+        selfDrive: draft.selfDrive,
+        withDriver: draft.withDriver,
+        featured: draft.featured,
+        available: draft.available,
+        description: draft.description,
+        includes,
+      })
+      flash('Hire listing updated')
+    } else {
+      addRental({
+        dealerId,
+        make: draft.make,
+        model: draft.model,
+        year: draft.year,
+        pricePerDay: draft.pricePerDay,
+        pricePerWeek: draft.pricePerWeek,
+        deposit: draft.deposit,
+        transmission: draft.transmission,
+        fuel: draft.fuel,
+        bodyType: draft.bodyType,
+        seats: draft.seats,
+        city: draft.city,
+        county: draft.county,
+        withDriver: draft.withDriver,
+        selfDrive: draft.selfDrive,
+        featured: draft.featured,
+        available: draft.available,
+        description:
+          draft.description.trim() ||
+          `${draft.year} ${draft.make} ${draft.model} for hire from ${dealer?.name ?? session.name}.`,
+        includes,
+      })
+      flash('Hire car listed on Kenya Vehicles')
+    }
+    closeForm()
   }
 
   return (
@@ -92,7 +199,7 @@ export function DealerRentals() {
         <div>
           <h2>Your rental fleet</h2>
           <p style={{ margin: '0.2rem 0 0', color: '#64748b', fontSize: '0.85rem' }}>
-            Dealers list hire cars — buyers book them on Car Rental
+            Add and edit hire cars — buyers book them on Car Rental
           </p>
         </div>
         <div className="admin-toolbar-actions">
@@ -104,35 +211,47 @@ export function DealerRentals() {
           <button
             type="button"
             className="admin-btn admin-btn-primary"
-            onClick={() => setShowForm((v) => !v)}
+            onClick={() => (mode === 'add' ? closeForm() : openAdd())}
           >
-            {showForm ? 'Close form' : 'List hire car'}
+            {mode === 'add' ? 'Close form' : 'Add listing'}
           </button>
           <span className="admin-btn admin-btn-ghost">{filtered.length} rentals</span>
         </div>
       </div>
 
-      {showForm && (
+      {mode !== 'closed' && (
         <section className="admin-panel" style={{ marginBottom: '1rem' }}>
           <div className="admin-panel-head">
             <div>
-              <h2>New hire listing</h2>
-              <p>Appears on the public Car Rental page under your yard</p>
+              <h2>{mode === 'edit' ? 'Edit hire listing' : 'New hire listing'}</h2>
+              <p>
+                {mode === 'edit'
+                  ? 'Changes show on the Car Rental marketplace immediately'
+                  : 'Appears on the public Car Rental page under your yard'}
+              </p>
             </div>
+            <button type="button" className="admin-btn admin-btn-ghost" onClick={closeForm}>
+              Cancel
+            </button>
           </div>
-          <form onSubmit={onAdd} style={{ padding: '0 1.2rem 1.2rem' }} className="admin-content">
+          <form onSubmit={onSave} style={{ padding: '0 1.2rem 1.2rem' }}>
             <div className="grid-2">
               <div className="field">
                 <label htmlFor="r-make">Make</label>
-                <input id="r-make" required value={make} onChange={(e) => setMake(e.target.value)} />
+                <input
+                  id="r-make"
+                  required
+                  value={draft.make}
+                  onChange={(e) => patchDraft('make', e.target.value)}
+                />
               </div>
               <div className="field">
                 <label htmlFor="r-model">Model</label>
                 <input
                   id="r-model"
                   required
-                  value={model}
-                  onChange={(e) => setModel(e.target.value)}
+                  value={draft.model}
+                  onChange={(e) => patchDraft('model', e.target.value)}
                   placeholder="Axio"
                 />
               </div>
@@ -144,16 +263,16 @@ export function DealerRentals() {
                   min={1990}
                   max={2030}
                   required
-                  value={year}
-                  onChange={(e) => setYear(Number(e.target.value) || year)}
+                  value={draft.year}
+                  onChange={(e) => patchDraft('year', Number(e.target.value) || draft.year)}
                 />
               </div>
               <div className="field">
                 <label htmlFor="r-body">Body</label>
                 <select
                   id="r-body"
-                  value={bodyType}
-                  onChange={(e) => setBodyType(e.target.value as BodyType)}
+                  value={draft.bodyType}
+                  onChange={(e) => patchDraft('bodyType', e.target.value as BodyType)}
                 >
                   {bodies.map((b) => (
                     <option key={b}>{b}</option>
@@ -167,8 +286,8 @@ export function DealerRentals() {
                   type="number"
                   min={500}
                   required
-                  value={pricePerDay}
-                  onChange={(e) => setPricePerDay(Number(e.target.value) || 0)}
+                  value={draft.pricePerDay}
+                  onChange={(e) => patchDraft('pricePerDay', Number(e.target.value) || 0)}
                 />
               </div>
               <div className="field">
@@ -178,8 +297,8 @@ export function DealerRentals() {
                   type="number"
                   min={1000}
                   required
-                  value={pricePerWeek}
-                  onChange={(e) => setPricePerWeek(Number(e.target.value) || 0)}
+                  value={draft.pricePerWeek}
+                  onChange={(e) => patchDraft('pricePerWeek', Number(e.target.value) || 0)}
                 />
               </div>
               <div className="field">
@@ -189,8 +308,8 @@ export function DealerRentals() {
                   type="number"
                   min={0}
                   required
-                  value={deposit}
-                  onChange={(e) => setDeposit(Number(e.target.value) || 0)}
+                  value={draft.deposit}
+                  onChange={(e) => patchDraft('deposit', Number(e.target.value) || 0)}
                 />
               </div>
               <div className="field">
@@ -201,16 +320,18 @@ export function DealerRentals() {
                   min={2}
                   max={30}
                   required
-                  value={seats}
-                  onChange={(e) => setSeats(Number(e.target.value) || 5)}
+                  value={draft.seats}
+                  onChange={(e) => patchDraft('seats', Number(e.target.value) || 5)}
                 />
               </div>
               <div className="field">
                 <label htmlFor="r-trans">Transmission</label>
                 <select
                   id="r-trans"
-                  value={transmission}
-                  onChange={(e) => setTransmission(e.target.value as 'Automatic' | 'Manual')}
+                  value={draft.transmission}
+                  onChange={(e) =>
+                    patchDraft('transmission', e.target.value as RentalCar['transmission'])
+                  }
                 >
                   <option>Automatic</option>
                   <option>Manual</option>
@@ -220,16 +341,32 @@ export function DealerRentals() {
                 <label htmlFor="r-fuel">Fuel</label>
                 <select
                   id="r-fuel"
-                  value={fuel}
-                  onChange={(e) =>
-                    setFuel(e.target.value as 'Petrol' | 'Diesel' | 'Hybrid' | 'Electric')
-                  }
+                  value={draft.fuel}
+                  onChange={(e) => patchDraft('fuel', e.target.value as RentalCar['fuel'])}
                 >
                   <option>Petrol</option>
                   <option>Diesel</option>
                   <option>Hybrid</option>
                   <option>Electric</option>
                 </select>
+              </div>
+              <div className="field">
+                <label htmlFor="r-city">City</label>
+                <input
+                  id="r-city"
+                  required
+                  value={draft.city}
+                  onChange={(e) => patchDraft('city', e.target.value)}
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="r-county">County</label>
+                <input
+                  id="r-county"
+                  required
+                  value={draft.county}
+                  onChange={(e) => patchDraft('county', e.target.value)}
+                />
               </div>
             </div>
 
@@ -238,9 +375,19 @@ export function DealerRentals() {
               <textarea
                 id="r-desc"
                 rows={3}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={draft.description}
+                onChange={(e) => patchDraft('description', e.target.value)}
                 placeholder="Who this hire car is best for…"
+              />
+            </div>
+
+            <div className="field" style={{ marginTop: '0.85rem' }}>
+              <label htmlFor="r-includes">Includes (comma-separated)</label>
+              <input
+                id="r-includes"
+                value={draft.includesText}
+                onChange={(e) => patchDraft('includesText', e.target.value)}
+                placeholder="Insurance, Airport pickup, GPS"
               />
             </div>
 
@@ -248,24 +395,45 @@ export function DealerRentals() {
               <label className="check-row">
                 <input
                   type="checkbox"
-                  checked={selfDrive}
-                  onChange={(e) => setSelfDrive(e.target.checked)}
+                  checked={draft.selfDrive}
+                  onChange={(e) => patchDraft('selfDrive', e.target.checked)}
                 />
                 Self-drive
               </label>
               <label className="check-row">
                 <input
                   type="checkbox"
-                  checked={withDriver}
-                  onChange={(e) => setWithDriver(e.target.checked)}
+                  checked={draft.withDriver}
+                  onChange={(e) => patchDraft('withDriver', e.target.checked)}
                 />
                 With driver
               </label>
+              <label className="check-row">
+                <input
+                  type="checkbox"
+                  checked={draft.featured}
+                  onChange={(e) => patchDraft('featured', e.target.checked)}
+                />
+                Featured hire
+              </label>
+              <label className="check-row">
+                <input
+                  type="checkbox"
+                  checked={draft.available}
+                  onChange={(e) => patchDraft('available', e.target.checked)}
+                />
+                Available now
+              </label>
             </div>
 
-            <button type="submit" className="admin-btn admin-btn-primary" style={{ marginTop: '1rem' }}>
-              Publish hire listing
-            </button>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '1rem' }}>
+              <button type="submit" className="admin-btn admin-btn-primary">
+                {mode === 'edit' ? 'Save changes' : 'Publish hire listing'}
+              </button>
+              <button type="button" className="admin-btn admin-btn-ghost" onClick={closeForm}>
+                Cancel
+              </button>
+            </div>
           </form>
         </section>
       )}
@@ -313,6 +481,9 @@ export function DealerRentals() {
                       <Link to={`/rentals/${car.id}`} target="_blank">
                         <button type="button">View</button>
                       </Link>
+                      <button type="button" onClick={() => openEdit(car)}>
+                        Edit
+                      </button>
                       <button
                         type="button"
                         onClick={() => {
@@ -330,7 +501,7 @@ export function DealerRentals() {
                 <tr>
                   <td colSpan={7}>
                     <div className="admin-empty">
-                      No hire cars yet. List one to show on the Car Rental marketplace.
+                      No hire cars yet. Tap <strong>Add listing</strong> to publish one.
                     </div>
                   </td>
                 </tr>
