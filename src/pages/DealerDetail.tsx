@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { CarCard } from '../components/CarCard'
+import { CustomerReviews } from '../components/CustomerReviews'
 import { MessageDealerModal } from '../components/MessageDealerModal'
 import { ReportAccountModal } from '../components/ReportAccountModal'
 import { VerifiedBadge } from '../components/VerifiedBadge'
 import { getCarsByDealer } from '../data/cars'
 import { getDealer } from '../data/dealers'
+import { getDealerReviewStats, subscribeReviews } from '../data/reviews'
 import './DealerDetail.css'
 
 export function DealerDetail() {
@@ -14,6 +16,19 @@ export function DealerDetail() {
   const stock = dealer ? getCarsByDealer(dealer.id) : []
   const [reportOpen, setReportOpen] = useState(false)
   const [messageOpen, setMessageOpen] = useState(false)
+  const [stats, setStats] = useState(() =>
+    dealer
+      ? getDealerReviewStats(dealer.id, dealer.rating, dealer.reviewCount)
+      : { average: 0, count: 0, customerCount: 0 },
+  )
+
+  useEffect(() => {
+    if (!dealer) return
+    const refresh = () =>
+      setStats(getDealerReviewStats(dealer.id, dealer.rating, dealer.reviewCount))
+    refresh()
+    return subscribeReviews(refresh)
+  }, [dealer])
 
   if (!dealer) {
     return (
@@ -81,11 +96,11 @@ export function DealerDetail() {
           <p>{dealer.bio}</p>
           <div className="dealer-stats-row">
             <div>
-              <strong>★ {dealer.rating}</strong>
-              <span>{dealer.reviewCount} reviews</span>
+              <strong>★ {stats.average.toFixed(1)}</strong>
+              <span>{stats.count} reviews</span>
             </div>
             <div>
-              <strong>{dealer.carsListed}</strong>
+              <strong>{stock.length || dealer.carsListed}</strong>
               <span>cars listed</span>
             </div>
             <div>
@@ -114,6 +129,15 @@ export function DealerDetail() {
             ))}
           </div>
         )}
+
+        <CustomerReviews
+          dealerId={dealer.id}
+          dealerName={dealer.name}
+          seedRating={dealer.rating}
+          seedCount={dealer.reviewCount}
+          targetType="Dealer"
+          targetId={dealer.id}
+        />
       </div>
 
       <ReportAccountModal

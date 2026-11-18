@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { CustomerReviews } from '../components/CustomerReviews'
 import { MessageDealerModal } from '../components/MessageDealerModal'
 import { ReportAccountModal } from '../components/ReportAccountModal'
 import { VerifiedBadge } from '../components/VerifiedBadge'
@@ -521,6 +522,16 @@ export function CarDetail() {
             </Link>
           </div>
         </div>
+
+        <CustomerReviews
+          dealerId={dealer.id}
+          dealerName={dealer.name}
+          seedRating={dealer.rating}
+          seedCount={dealer.reviewCount}
+          targetType="Car"
+          targetId={car.id}
+          relatedLabel={`${car.year} ${car.make} ${car.model}`}
+        />
       </div>
 
       <ReportAccountModal
