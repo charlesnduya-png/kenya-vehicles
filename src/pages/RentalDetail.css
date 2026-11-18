@@ -1,0 +1,54 @@
+.rental-per {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.rental-week {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: -0.35rem 0 0.75rem;
+}
+
+.rental-book {
+  margin-top: 1rem;
+}
+
+.rental-book h2 {
+  font-size: 1.15rem;
+  margin-bottom: 0.3rem;
+}
+
+.rental-book > p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.rental-total {
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  background: #fff8e7;
+  border: 1px solid #f0c14b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rental-total strong {
+  font-size: 1.25rem;
+  color: var(--price);
+}
+
+.rental-note {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.rental-book .btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

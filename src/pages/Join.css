@@ -1,0 +1,109 @@
+.join-page {
+  padding-top: 0.75rem;
+}
+
+.join-head {
+  max-width: 46rem;
+  margin-bottom: 1rem;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+}
+
+.join-head h1 {
+  font-size: 1.4rem;
+  margin-bottom: 0.35rem;
+}
+
+.join-head p {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.join-tabs {
+  display: inline-flex;
+  gap: 0;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.join-tabs button {
+  border: none;
+  background: #fff;
+  color: var(--ink);
+  padding: 0.65rem 1.1rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.join-tabs button + button {
+  border-left: 1px solid var(--border);
+}
+
+.join-tabs button.is-active {
+  background: #232f3e;
+  color: #fff;
+}
+
+.join-layout {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+.join-benefits,
+.join-form {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+}
+
+.join-benefits h2,
+.join-form h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.join-benefits ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  font-size: 0.92rem;
+}
+
+.join-pricing-note {
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.join-pricing-note a {
+  font-weight: 700;
+}
+
+@media (max-width: 860px) {
+  .join-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .join-tabs {
+    display: flex;
+    width: 100%;
+  }
+
+  .join-tabs button {
+    flex: 1;
+    padding-inline: 0.4rem;
+    font-size: 0.85rem;
+  }
+}

@@ -1,0 +1,18 @@
+.report-page-inner {
+  max-width: 640px;
+}
+
+.report-page-card {
+  margin-top: 0.5rem;
+}
+
+.report-page-card h1 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: 1.65rem;
+}
+
+.report-page-card > p {
+  color: var(--muted);
+  line-height: 1.45;
+  margin: 0;
+}

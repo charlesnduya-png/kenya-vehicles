@@ -1,0 +1,79 @@
+.msg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(15, 23, 42, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.msg-modal {
+  width: min(100%, 520px);
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.28);
+  padding: 1.15rem 1.2rem 1.25rem;
+  max-height: min(92vh, 720px);
+  overflow: auto;
+}
+
+.msg-modal-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.msg-eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.msg-modal-head h2,
+.msg-done h2 {
+  margin: 0.2rem 0 0.35rem;
+  font-size: 1.35rem;
+}
+
+.msg-modal-head p,
+.msg-done p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.msg-x {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #d5d9d9;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.msg-actions,
+.msg-done-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.msg-done {
+  text-align: center;
+  padding: 0.5rem 0.25rem 0.25rem;
+}
+
+.msg-done-actions {
+  justify-content: center;
+}

@@ -1,0 +1,88 @@
+.amz-footer {
+  margin-top: 1.5rem;
+}
+
+.amz-back-top {
+  width: 100%;
+  border: none;
+  background: var(--nav-sub);
+  color: #fff;
+  padding: 0.85rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.amz-back-top:hover {
+  background: #485769;
+}
+
+.amz-footer-main {
+  background: var(--nav-2);
+  color: #ddd;
+  padding: 2.5rem 0;
+}
+
+.amz-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.amz-footer h4 {
+  color: #fff;
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.amz-footer a,
+.amz-footer span {
+  display: block;
+  color: #ddd !important;
+  text-decoration: none !important;
+  font-size: 0.85rem;
+  margin-bottom: 0.45rem;
+}
+
+.amz-footer a:hover {
+  text-decoration: underline !important;
+}
+
+.amz-footer-brand {
+  background: #232f3e;
+  border-top: 1px solid #3a4553;
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+
+.amz-footer-brand .amz-logo {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.amz-footer-brand p {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.amz-footer-legal {
+  background: #131a22;
+  color: #999;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 0.85rem 1rem 1.25rem;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 800px) {
+  .amz-footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .amz-footer-grid {
+    grid-template-columns: 1fr;
+  }
+}

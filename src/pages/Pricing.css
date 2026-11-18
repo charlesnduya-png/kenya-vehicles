@@ -1,0 +1,138 @@
+.pricing-page {
+  padding-top: 0.75rem;
+}
+
+.pricing-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.pricing-hero h1 {
+  font-size: 1.45rem;
+  margin-bottom: 0.35rem;
+}
+
+.pricing-hero p {
+  color: var(--muted);
+  max-width: 42rem;
+  font-size: 0.95rem;
+}
+
+.pricing-block {
+  margin-bottom: 1.5rem;
+}
+
+.pricing-block-head {
+  margin-bottom: 0.9rem;
+}
+
+.pricing-block-head h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+}
+
+.pricing-block-head p {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.pricing-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.pricing-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.pricing-card.is-popular {
+  border-color: #008060;
+  box-shadow: 0 8px 24px rgba(0, 128, 96, 0.12);
+}
+
+.pricing-card.is-selected {
+  border-color: #0e7490;
+  box-shadow: 0 0 0 2px rgba(14, 116, 144, 0.15);
+}
+
+.pricing-tag {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #008060;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+}
+
+.pricing-card h3 {
+  font-size: 1.1rem;
+}
+
+.pricing-amount {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.pricing-amount small {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-left: 0.25rem;
+}
+
+.pricing-limit {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.pricing-card ul {
+  margin: 0.35rem 0 0.75rem;
+  padding-left: 1.1rem;
+  color: var(--ink);
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.pricing-card .btn {
+  width: 100%;
+}
+
+.pricing-confirm {
+  margin-top: 0.85rem;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  background: #e6f5ed;
+  color: #067d62;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 900px) {
+  .pricing-grid,
+  .pricing-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,142 @@
+.amz-home {
+  position: relative;
+}
+
+.amz-home-body {
+  position: relative;
+  margin-top: 0;
+  padding-top: 1rem;
+  padding-bottom: 1.5rem;
+}
+
+.amz-shelf {
+  background: #fff;
+  padding: 1rem 1.1rem 1.25rem;
+  margin-bottom: 1.1rem;
+  border-radius: 2px;
+}
+
+.amz-shelf-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.amz-shelf-head h2 {
+  font-size: 1.25rem;
+}
+
+.amz-promo-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.amz-promo h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.4rem;
+}
+
+.amz-promo p {
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+  font-size: 0.92rem;
+}
+
+.amz-promo ul {
+  margin: 0 0 1rem;
+  padding-left: 1.1rem;
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.amz-promo-logos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.9rem;
+}
+
+.amz-promo-logos span {
+  font-size: 0.75rem;
+  background: #f0f2f2;
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.5rem;
+  border-radius: 3px;
+}
+
+.amz-promo-loan {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.amz-promo-loan img {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  object-fit: cover;
+}
+
+.amz-dealer-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.amz-dealer-card {
+  text-decoration: none !important;
+  color: var(--ink) !important;
+  padding: 0.75rem !important;
+}
+
+.amz-dealer-card > img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  margin-bottom: 0.55rem;
+}
+
+.amz-dealer-card h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.amz-dealer-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  background: #fff;
+  margin: 0 !important;
+}
+
+.amz-dealer-card p {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.amz-dealer-card .stars span {
+  color: var(--link);
+}
+
+@media (max-width: 1000px) {
+  .amz-dealer-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .amz-promo-row,
+  .amz-dealer-row {
+    grid-template-columns: 1fr;
+  }
+}

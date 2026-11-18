@@ -1,0 +1,417 @@
+.car-detail {
+  padding-top: 0.75rem;
+}
+
+.back-link {
+  display: none;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1.25rem;
+  align-items: start;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.detail-main-image {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  aspect-ratio: 1 / 0.75;
+  background: #fff;
+}
+
+.detail-main-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.detail-thumbs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+}
+
+.detail-thumbs button {
+  border: 2px solid var(--border);
+  padding: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  width: 72px;
+  height: 56px;
+  cursor: pointer;
+  background: #fff;
+}
+
+.detail-thumbs button.is-active {
+  border-color: #e77600;
+}
+
+.detail-thumbs img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-info .eyebrow {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--link);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.detail-info h1 {
+  font-size: 1.45rem;
+  font-weight: 400;
+  margin-bottom: 0.35rem;
+}
+
+.detail-price {
+  font-size: 1.7rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 0.65rem;
+}
+
+.detail-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+}
+
+.detail-specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin: 0 0 0.9rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #f7fafa;
+}
+
+.detail-specs dt {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.detail-specs dd {
+  margin: 0.1rem 0 0;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.detail-desc {
+  color: var(--ink);
+  font-size: 0.92rem;
+  margin-bottom: 0.75rem;
+}
+
+.detail-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.detail-features li {
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  background: #f0f2f2;
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+}
+
+.dealer-box {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+}
+
+.dealer-box-label {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.dealer-box p:last-child {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.15rem;
+}
+
+.detail-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.35rem 0 0.85rem;
+}
+
+.btn-buy-loan {
+  background: #008060 !important;
+  border-color: #006e52 !important;
+  color: #fff !important;
+}
+
+.btn-buy-loan:hover {
+  background: #006e52 !important;
+  color: #fff !important;
+}
+
+.btn-make-offer {
+  position: relative;
+  overflow: hidden;
+  animation: makeOfferPulse 2.4s ease-in-out infinite;
+  border-color: #e77600 !important;
+  color: #c45500 !important;
+  background: #fff8f0 !important;
+}
+
+.btn-make-offer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.65) 48%,
+    transparent 62%
+  );
+  transform: translateX(-120%);
+  animation: makeOfferShine 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.btn-make-offer:hover {
+  animation: none;
+  transform: translateY(-1px) scale(1.03);
+  background: #fff1e0 !important;
+  box-shadow: 0 6px 16px rgba(228, 121, 17, 0.22);
+}
+
+.btn-make-offer:hover::after {
+  animation: none;
+}
+
+@keyframes makeOfferPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(231, 118, 0, 0.28);
+  }
+  50% {
+    transform: scale(1.035);
+    box-shadow: 0 0 0 8px rgba(231, 118, 0, 0);
+  }
+}
+
+@keyframes makeOfferShine {
+  0%,
+  40% {
+    transform: translateX(-120%);
+  }
+  70%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-make-offer,
+  .btn-make-offer::after {
+    animation: none;
+  }
+
+  .btn-make-offer:hover {
+    transform: none;
+  }
+}
+
+.dealer-box-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 120px;
+}
+
+.loan-request-form {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.detail-lower {
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.enquire-card,
+.finance-card,
+.offer-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+}
+
+.enquire-card h2,
+.finance-card h2,
+.offer-card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.3rem;
+}
+
+.enquire-card > p,
+.finance-card > p,
+.offer-card > p {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-bottom: 0.85rem;
+}
+
+.enquire-success {
+  padding: 0.85rem;
+  border-radius: 4px;
+  background: #e6f5ed;
+  color: var(--success);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.offer-error {
+  margin: 0.65rem 0 0;
+  color: #b12704;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.offer-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.offer-chip {
+  border: 1px solid #d5d9d9;
+  background: #f7fafa;
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #0f1111;
+}
+
+.offer-chip:hover {
+  border-color: #e77600;
+  background: #fffaf2;
+}
+
+.finance-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.finance-sliders input[type='range'] {
+  width: 100%;
+  accent-color: #e77600;
+}
+
+.finance-result {
+  margin: 0.95rem 0;
+  padding: 0.85rem;
+  border-radius: 4px;
+  background: #fff8e7;
+  border: 1px solid #f0c14b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.finance-result strong {
+  font-size: 1.25rem;
+  color: var(--price);
+}
+
+.finance-partners {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.finance-partner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--ink) !important;
+  text-decoration: none !important;
+}
+
+.finance-partner:hover {
+  background: #f7fafa;
+}
+
+.finance-partner span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.finance-partner strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.finance-partner-logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 1100px) {
+  .detail-lower {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .finance-card {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .detail-grid,
+  .detail-lower {
+    grid-template-columns: 1fr;
+  }
+
+  .finance-card {
+    grid-column: auto;
+  }
+
+  .dealer-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
