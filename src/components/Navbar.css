@@ -240,7 +240,9 @@
   }
 
   .amz-cart {
+    margin-left: auto;
     padding: 0.15rem 0.25rem;
+    flex-shrink: 0;
   }
 
   .amz-cart-icon {
@@ -275,13 +277,34 @@
   }
 
   .amz-top-inner {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'menu brand cart'
+      'search search search';
+    align-items: center;
+    column-gap: 0.35rem;
     row-gap: 0.35rem;
   }
 
+  .amz-menu-btn {
+    grid-area: menu;
+  }
+
+  .amz-top-inner > .brand {
+    grid-area: brand;
+    justify-self: start;
+  }
+
+  .amz-deliver,
+  .amz-account {
+    display: none;
+  }
+
   .amz-search {
-    order: 5;
-    flex: 1 1 100%;
+    grid-area: search;
+    width: 100%;
+    min-width: 0;
     height: 32px;
     border-radius: 4px;
   }
@@ -296,6 +319,13 @@
 
   .amz-search button {
     width: 36px;
+  }
+
+  .amz-cart {
+    grid-area: cart;
+    justify-self: end;
+    margin-left: 0;
+    order: unset;
   }
 
   .amz-cart strong {
