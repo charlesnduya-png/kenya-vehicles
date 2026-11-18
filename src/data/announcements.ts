@@ -14,17 +14,7 @@ export type SiteAnnouncement = {
 const STORAGE_KEY = 'kv-site-announcements'
 const EVENT = 'kv-announcements-changed'
 
-const seed: SiteAnnouncement[] = [
-  {
-    id: 'a1',
-    title: 'Welcome to Kenya Vehicles',
-    message: 'Shop cars, rentals and loans from verified dealers across Kenya.',
-    tone: 'info',
-    active: false,
-    createdAt: '2026-03-10T09:00:00.000Z',
-    pushedBy: 'Platform Admin',
-  },
-]
+const seed: SiteAnnouncement[] = []
 
 function read(): SiteAnnouncement[] {
   try {

@@ -101,7 +101,7 @@ export function Navbar() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search cars, rentals, dealers, loans"
+              placeholder="Search Kenya's largest car marketplace"
               aria-label="Search"
             />
             <button type="submit" aria-label="Search">

@@ -1,6 +1,6 @@
-# Kenya Vehicles — multi-dealer car marketplace
+# Kenya Vehicles — Kenya's largest car marketplace
 
-Kenya Vehicles helps buyers find cars from dealers across Kenya and compare car loan options from banks, saccos, microfinance, and fintechs in one place.
+Kenya Vehicles is Kenya's largest car marketplace — buy, hire & finance with confidence. Shop verified dealers nationwide and compare car loan options from banks, saccos, microfinance, and fintechs in one place.
 
 ## Features
 

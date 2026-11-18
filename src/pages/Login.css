@@ -1,18 +1,14 @@
 .login-layout {
-  display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: 1rem;
-  align-items: start;
+  max-width: 420px;
+  margin: 0 auto;
   padding-bottom: 1.5rem;
 }
 
-.login-card h1,
-.login-dealers h2 {
+.login-card h1 {
   margin: 0.2rem 0 0.45rem;
 }
 
-.login-lead,
-.login-dealers > p {
+.login-lead {
   margin: 0;
   color: var(--muted);
   line-height: 1.45;
@@ -35,46 +31,4 @@
   margin: 1rem 0 0;
   font-size: 0.88rem;
   color: var(--muted);
-}
-
-.login-side {
-  display: grid;
-  gap: 1rem;
-}
-
-.login-dealer-list {
-  margin-top: 0.9rem;
-  display: grid;
-  gap: 0.55rem;
-}
-
-.login-dealer-btn {
-  text-align: left;
-  border: 1px solid #d5d9d9;
-  background: #fff;
-  border-radius: 6px;
-  padding: 0.75rem 0.85rem;
-  cursor: pointer;
-  display: grid;
-  gap: 0.15rem;
-}
-
-.login-dealer-btn:hover {
-  border-color: #e77600;
-  background: #fffaf2;
-}
-
-.login-dealer-btn strong {
-  font-size: 0.95rem;
-}
-
-.login-dealer-btn span {
-  color: #565959;
-  font-size: 0.8rem;
-}
-
-@media (max-width: 860px) {
-  .login-layout {
-    grid-template-columns: 1fr;
-  }
 }

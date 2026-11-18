@@ -176,7 +176,7 @@ export function DealerProfile() {
                 <td>
                   <strong>Plan</strong>
                 </td>
-                <td>{session.plan ?? 'Starter'}</td>
+                <td>{session.plan ?? 'Dealer'}</td>
               </tr>
             </tbody>
           </table>

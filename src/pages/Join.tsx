@@ -1,41 +1,175 @@
 import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
-import { agentBadgeProducts, dealerPlans, formatBillingKES } from '../data/billing'
+import { Link, useNavigate } from 'react-router-dom'
+import { homePathForSession, setSession } from '../data/auth'
+import {
+  registerDealerAccount,
+  registerLenderAccount,
+} from '../data/partnerRegistry'
+import { sendVerificationCode, verifyEmailCode } from '../lib/mailApi'
 import './Join.css'
 
-type Tab = 'dealer' | 'agent' | 'lender'
+type Tab = 'dealer' | 'lender'
 
 function initialTab(): Tab {
   if (typeof window === 'undefined') return 'dealer'
   if (window.location.hash === '#lenders') return 'lender'
-  if (window.location.hash === '#agents') return 'agent'
   return 'dealer'
 }
 
 export function Join() {
+  const navigate = useNavigate()
   const [tab, setTab] = useState<Tab>(initialTab)
   const [submitted, setSubmitted] = useState(false)
-  const [planId, setPlanId] = useState('plan-growth')
-  const [badgeId, setBadgeId] = useState('badge-monthly')
+  const [institutionType, setInstitutionType] = useState('Bank')
+
+  const [biz, setBiz] = useState('')
+  const [city, setCity] = useState('')
+  const [contact, setContact] = useState('')
+  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [notes, setNotes] = useState('')
+  const [code, setCode] = useState('')
+  const [codeSent, setCodeSent] = useState(false)
+  const [emailVerified, setEmailVerified] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const [info, setInfo] = useState('')
+  const [createdPath, setCreatedPath] = useState('')
+
+  function resetVerification() {
+    setCode('')
+    setCodeSent(false)
+    setEmailVerified(false)
+    setError('')
+    setInfo('')
+  }
+
+  async function onSendCode() {
+    setError('')
+    setInfo('')
+    const trimmed = email.trim()
+    if (!trimmed) {
+      setError('Enter your work email first.')
+      return
+    }
+    setBusy(true)
+    try {
+      await sendVerificationCode(trimmed, `join-${tab}`)
+      setCodeSent(true)
+      setEmailVerified(false)
+      setCode('')
+      setInfo('We sent a 6-digit code to your email. Enter it below to continue.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not send verification code.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function onVerifyCode() {
+    setError('')
+    setInfo('')
+    setBusy(true)
+    try {
+      await verifyEmailCode(email.trim(), code.trim(), `join-${tab}`)
+      setEmailVerified(true)
+      setInfo('Email verified. You can create your account.')
+    } catch (err) {
+      setEmailVerified(false)
+      setError(err instanceof Error ? err.message : 'Could not verify that code.')
+    } finally {
+      setBusy(false)
+    }
+  }
 
   function onSubmit(e: FormEvent) {
     e.preventDefault()
+    setError('')
+    if (!emailVerified) {
+      setError('Verify your email with the code we sent before submitting.')
+      return
+    }
+    if (password.trim().length < 8) {
+      setError('Password must be at least 8 characters.')
+      return
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+
+    if (tab === 'dealer') {
+      const result = registerDealerAccount({
+        businessName: biz,
+        city,
+        contactName: contact,
+        phone,
+        email,
+        password,
+        notes,
+      })
+      if (!result.ok) {
+        setError(result.error)
+        return
+      }
+      const session = {
+        accountId: result.account.id,
+        name: result.account.name,
+        email: result.account.email,
+        role: 'Dealer' as const,
+        city: result.account.city,
+        plan: 'Dealer',
+        dealerId: result.dealer.id,
+      }
+      setSession(session)
+      setCreatedPath(homePathForSession(session))
+      setSubmitted(true)
+      window.setTimeout(() => navigate('/dealer'), 1200)
+      return
+    }
+
+    const result = registerLenderAccount({
+      businessName: biz,
+      city,
+      contactName: contact,
+      phone,
+      email,
+      password,
+      institutionType,
+      notes,
+    })
+    if (!result.ok) {
+      setError(result.error)
+      return
+    }
+    const session = {
+      accountId: result.account.id,
+      name: result.account.name,
+      email: result.account.email,
+      role: 'Loan partner' as const,
+      city: result.account.city,
+      plan: 'Lender',
+      loanPartnerId: result.partner.id,
+    }
+    setSession(session)
+    setCreatedPath(homePathForSession(session))
     setSubmitted(true)
+    window.setTimeout(() => navigate('/lender'), 1200)
   }
 
-  const title =
-    tab === 'dealer' ? 'Dealer application' : tab === 'agent' ? 'Agent application' : 'Lender application'
+  const title = tab === 'dealer' ? 'Create dealer account' : 'Create lender account'
 
   return (
     <section className="section join-page">
       <div className="container">
         <div className="join-head fade-up">
           <p className="eyebrow">Grow with Kenya Vehicles</p>
-          <h1>Dealers, agents &amp; lenders — nationwide</h1>
+          <h1>Dealers &amp; lenders — nationwide</h1>
           <p>
-            Dealer accounts run on monthly subscriptions. Agents can buy a Verified Badge. Loan
-            partners connect buyers to financing. See{' '}
-            <Link to="/pricing">full pricing</Link>.
+            Create your Kenya Vehicles account to list stock, manage your yard or lending desk, and
+            reach buyers across Kenya.
           </p>
         </div>
 
@@ -46,20 +180,10 @@ export function Join() {
             onClick={() => {
               setTab('dealer')
               setSubmitted(false)
+              resetVerification()
             }}
           >
             Dealer
-          </button>
-          <button
-            type="button"
-            id="agents"
-            className={tab === 'agent' ? 'is-active' : undefined}
-            onClick={() => {
-              setTab('agent')
-              setSubmitted(false)
-            }}
-          >
-            Agent
           </button>
           <button
             type="button"
@@ -68,6 +192,7 @@ export function Join() {
             onClick={() => {
               setTab('lender')
               setSubmitted(false)
+              resetVerification()
             }}
           >
             Lender
@@ -76,42 +201,22 @@ export function Join() {
 
         <div className="join-layout">
           <div className="join-benefits fade-up">
-            {tab === 'dealer' && (
+            {tab === 'dealer' ? (
               <>
-                <h2>Dealer monthly subscription</h2>
+                <h2>Why dealers join</h2>
                 <ul>
-                  <li>Required monthly plan to keep your yard listings live</li>
-                  <li>Starter, Growth, or Enterprise based on stock size</li>
-                  <li>Featured slots and loan attach on paid plans</li>
-                  <li>Cancel or upgrade anytime from billing</li>
+                  <li>One account for yards and brokers</li>
+                  <li>List sale and hire cars from your portal</li>
+                  <li>Reach buyers looking across Kenya</li>
+                  <li>Get direct enquiries on your stock</li>
                 </ul>
-                <p className="join-pricing-note">
-                  From {formatBillingKES(dealerPlans[0].monthlyPrice)}/month ·{' '}
-                  <Link to="/pricing">Compare plans</Link>
-                </p>
               </>
-            )}
-            {tab === 'agent' && (
+            ) : (
               <>
-                <h2>Buy a Verified Agent Badge</h2>
-                <ul>
-                  <li>Show a Verified badge on your agent profile</li>
-                  <li>Rank higher in buyer search results</li>
-                  <li>Monthly or annual badge packages</li>
-                  <li>Build trust without a full dealership yard</li>
-                </ul>
-                <p className="join-pricing-note">
-                  From {formatBillingKES(agentBadgeProducts[0].price)}/month ·{' '}
-                  <Link to="/pricing">Badge packages</Link>
-                </p>
-              </>
-            )}
-            {tab === 'lender' && (
-              <>
-                <h2>Why lenders join Kenya Vehicles</h2>
+                <h2>Why lenders join</h2>
                 <ul>
                   <li>Meet buyers at the moment they pick a car</li>
-                  <li>Partner with subscribed dealers for cleaner collateral</li>
+                  <li>Partner with dealers for cleaner collateral</li>
                   <li>Show rates, deposit rules, and cities you serve</li>
                   <li>Capture applications alongside marketplace traffic</li>
                 </ul>
@@ -123,78 +228,168 @@ export function Join() {
             <h2>{title}</h2>
             {submitted ? (
               <div className="enquire-success">
-                {tab === 'dealer' &&
-                  'Thanks — we will activate your dealer subscription after review (1–2 business days).'}
-                {tab === 'agent' &&
-                  'Thanks — complete verified badge payment and we will issue your badge shortly.'}
-                {tab === 'lender' &&
-                  'Thanks — Kenya Vehicles partnerships will contact you within 1–2 business days.'}
+                {tab === 'dealer' ? (
+                  <>
+                    Dealer account created. Opening your portal. Use this email and the password you
+                    chose to sign in later
+                    {createdPath ? (
+                      <>
+                        . <Link to={createdPath}>Go to portal</Link>
+                      </>
+                    ) : null}
+                  </>
+                ) : (
+                  <>
+                    Lender account created. Opening your portal. Use this email and the password you
+                    chose to sign in later
+                    {createdPath ? (
+                      <>
+                        . <Link to={createdPath}>Go to portal</Link>
+                      </>
+                    ) : null}
+                  </>
+                )}
               </div>
             ) : (
               <>
                 <div className="grid-2">
                   <div className="field">
-                    <label htmlFor="biz">{tab === 'agent' ? 'Agent / trade name' : 'Business name'}</label>
-                    <input id="biz" required placeholder="Your company" />
+                    <label htmlFor="biz">Business / trade name</label>
+                    <input
+                      id="biz"
+                      required
+                      placeholder="Your company"
+                      value={biz}
+                      onChange={(e) => setBiz(e.target.value)}
+                    />
                   </div>
                   <div className="field">
                     <label htmlFor="city">City</label>
-                    <input id="city" required placeholder="Nairobi" />
+                    <input
+                      id="city"
+                      required
+                      placeholder="Nairobi"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                    />
                   </div>
                 </div>
                 <div className="grid-2" style={{ marginTop: '0.85rem' }}>
                   <div className="field">
                     <label htmlFor="contact">Contact person</label>
-                    <input id="contact" required placeholder="Full name" />
+                    <input
+                      id="contact"
+                      required
+                      placeholder="Full name"
+                      value={contact}
+                      onChange={(e) => setContact(e.target.value)}
+                    />
                   </div>
                   <div className="field">
                     <label htmlFor="phone">Phone</label>
-                    <input id="phone" required placeholder="+254 7.." />
+                    <input
+                      id="phone"
+                      required
+                      placeholder="+254 7.."
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
                   </div>
                 </div>
                 <div className="field" style={{ marginTop: '0.85rem' }}>
                   <label htmlFor="email">Work email</label>
-                  <input id="email" type="email" required placeholder="you@company.co.ke" />
+                  <div className="join-email-row">
+                    <input
+                      id="email"
+                      type="email"
+                      required
+                      placeholder="you@company.co.ke"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value)
+                        resetVerification()
+                      }}
+                      disabled={emailVerified}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-ghost"
+                      onClick={onSendCode}
+                      disabled={busy || emailVerified}
+                    >
+                      {codeSent && !emailVerified ? 'Resend code' : 'Send code'}
+                    </button>
+                  </div>
                 </div>
 
-                {tab === 'dealer' && (
+                {codeSent && !emailVerified && (
                   <div className="field" style={{ marginTop: '0.85rem' }}>
-                    <label htmlFor="plan">Monthly subscription plan</label>
-                    <select
-                      id="plan"
-                      value={planId}
-                      onChange={(e) => setPlanId(e.target.value)}
-                    >
-                      {dealerPlans.map((plan) => (
-                        <option key={plan.id} value={plan.id}>
-                          {plan.name} — {formatBillingKES(plan.monthlyPrice)}/mo
-                        </option>
-                      ))}
-                    </select>
+                    <label htmlFor="code">Verification code</label>
+                    <div className="join-email-row">
+                      <input
+                        id="code"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        pattern="[0-9]{6}"
+                        maxLength={6}
+                        required
+                        placeholder="6-digit code"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={onVerifyCode}
+                        disabled={busy || code.trim().length !== 6}
+                      >
+                        Verify
+                      </button>
+                    </div>
                   </div>
                 )}
 
-                {tab === 'agent' && (
-                  <div className="field" style={{ marginTop: '0.85rem' }}>
-                    <label htmlFor="badge">Verified badge package</label>
-                    <select
-                      id="badge"
-                      value={badgeId}
-                      onChange={(e) => setBadgeId(e.target.value)}
-                    >
-                      {agentBadgeProducts.map((product) => (
-                        <option key={product.id} value={product.id}>
-                          {product.billing} — {formatBillingKES(product.price)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                {emailVerified && (
+                  <p className="join-verify-ok">Email verified — you can create this account.</p>
                 )}
+
+                <div className="grid-2" style={{ marginTop: '0.85rem' }}>
+                  <div className="field">
+                    <label htmlFor="password">Password</label>
+                    <input
+                      id="password"
+                      type="password"
+                      required
+                      minLength={8}
+                      autoComplete="new-password"
+                      placeholder="At least 8 characters"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                  <div className="field">
+                    <label htmlFor="confirm-password">Confirm password</label>
+                    <input
+                      id="confirm-password"
+                      type="password"
+                      required
+                      minLength={8}
+                      autoComplete="new-password"
+                      placeholder="Repeat password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
 
                 {tab === 'lender' && (
                   <div className="field" style={{ marginTop: '0.85rem' }}>
                     <label htmlFor="type">Institution type</label>
-                    <select id="type" defaultValue="Bank">
+                    <select
+                      id="type"
+                      value={institutionType}
+                      onChange={(e) => setInstitutionType(e.target.value)}
+                    >
                       <option>Bank</option>
                       <option>Sacco</option>
                       <option>Microfinance</option>
@@ -208,18 +403,25 @@ export function Join() {
                   <textarea
                     id="notes"
                     placeholder={
-                      tab === 'agent'
+                      tab === 'dealer'
                         ? 'Areas you cover, brands you sell…'
-                        : 'Branches, brands, typical loan sizes…'
+                        : 'Branches, typical loan sizes…'
                     }
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
                   />
                 </div>
-                <button type="submit" className="btn btn-primary" style={{ marginTop: '1.1rem' }}>
-                  {tab === 'dealer'
-                    ? 'Start subscription application'
-                    : tab === 'agent'
-                      ? 'Apply & buy verified badge'
-                      : 'Submit application'}
+
+                {error && <p className="join-error">{error}</p>}
+                {info && !error && <p className="join-info">{info}</p>}
+
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{ marginTop: '1.1rem' }}
+                  disabled={busy || !emailVerified}
+                >
+                  {tab === 'dealer' ? 'Create dealer account' : 'Create lender account'}
                 </button>
               </>
             )}

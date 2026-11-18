@@ -28,22 +28,7 @@ export type AccountReport = {
 const STORAGE_KEY = 'kv-account-reports'
 const EVENT = 'kv-reports-changed'
 
-const seed: AccountReport[] = [
-  {
-    id: 'rep1',
-    targetType: 'Dealer',
-    targetId: 'd6',
-    targetName: 'Capital City Cars',
-    reason: 'Fake or misleading listing',
-    details: 'Price changed after I visited the yard and did not match the listing.',
-    reporterName: 'Jane Wanjiku',
-    reporterPhone: '+254 712 111 001',
-    reporterEmail: 'jane.w@gmail.com',
-    status: 'Under review',
-    createdAt: '2026-03-16T10:20:00.000Z',
-    relatedListing: 'c14 Nissan Note',
-  },
-]
+const seed: AccountReport[] = []
 
 function read(): AccountReport[] {
   try {

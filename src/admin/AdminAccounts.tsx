@@ -7,6 +7,8 @@ import {
   type AccountStatus,
   type AdminAccount,
 } from '../data/admin'
+import { activateDealerBadge, revokeDealerBadge } from '../data/dealerBadges'
+import { dealers } from '../data/dealers'
 
 export function AdminAccounts() {
   const [q, setQ] = useState('')
@@ -30,43 +32,44 @@ export function AdminAccounts() {
     window.setTimeout(() => setToast(''), 2500)
   }
 
-  function grantAgentSub(id: string) {
-    setAccounts((prev) =>
-      prev.map((a) =>
-        a.id === id
-          ? {
-              ...a,
-              role: 'Agent',
-              plan: 'Agent Pro',
-              billingStatus: 'Active',
-              status: 'Active',
-            }
-          : a,
-      ),
-    )
-    flash('Agent subscription granted (Agent Pro)')
-  }
-
   function grantBadge(id: string) {
+    const account = accounts.find((a) => a.id === id)
+    if (!account) return
+    const dealer =
+      dealers.find((d) => d.email.toLowerCase() === account.email.toLowerCase()) ||
+      dealers.find((d) => d.name.toLowerCase() === account.name.toLowerCase())
+    if (!dealer) {
+      flash('No yard profile linked to that dealer')
+      return
+    }
+    const row = activateDealerBadge({
+      accountId: account.id,
+      dealerId: dealer.id,
+      dealerName: account.name,
+      city: account.city,
+      grantedByAdmin: true,
+    })
     setAccounts((prev) =>
       prev.map((a) =>
         a.id === id
           ? {
               ...a,
+              role: 'Dealer',
               verifiedBadge: true,
-              plan: a.plan?.includes('Badge') ? a.plan : `${a.plan ?? 'Agent'} + Verified Badge`,
+              plan: 'Dealer + Verified Badge',
               billingStatus: 'Active',
               status: 'Active',
             }
           : a,
       ),
     )
-    flash('Verified badge granted')
+    flash(`Verified badge granted until ${row.renews}`)
   }
 
   function revokeBadge(id: string) {
+    revokeDealerBadge(id)
     setAccounts((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, verifiedBadge: false } : a)),
+      prev.map((a) => (a.id === id ? { ...a, verifiedBadge: false, plan: 'Dealer' } : a)),
     )
     flash('Verified badge revoked')
   }
@@ -85,8 +88,7 @@ export function AdminAccounts() {
         <div>
           <h2>Accounts</h2>
           <p style={{ margin: '0.2rem 0 0', color: '#64748b', fontSize: '0.85rem' }}>
-            Buyers, dealers (monthly plans), agents (subscriptions + verified badges), lenders, and
-            admins ·{' '}
+            Buyers, dealers (listing plan + optional 2-month verified badge), lenders, and admins ·{' '}
             <Link to="/admin/billing" style={{ fontWeight: 700 }}>
               Open billing grants
             </Link>
@@ -98,7 +100,6 @@ export function AdminAccounts() {
             <option value="All">All roles</option>
             <option>Buyer</option>
             <option>Dealer</option>
-            <option>Agent</option>
             <option>Loan partner</option>
             <option>Admin</option>
           </select>
@@ -121,10 +122,8 @@ export function AdminAccounts() {
           <strong>{accounts.filter((a) => a.role === 'Buyer').length}</strong>
         </article>
         <article className="admin-kpi">
-          <span>Dealers + agents</span>
-          <strong>
-            {accounts.filter((a) => a.role === 'Dealer' || a.role === 'Agent').length}
-          </strong>
+          <span>Dealers</span>
+          <strong>{accounts.filter((a) => a.role === 'Dealer').length}</strong>
         </article>
         <article className="admin-kpi">
           <span>Needs review</span>
@@ -189,11 +188,8 @@ export function AdminAccounts() {
                   </td>
                   <td>
                     <div className="admin-row-actions">
-                      {account.role === 'Agent' && (
+                      {account.role === 'Dealer' && (
                         <>
-                          <button type="button" onClick={() => grantAgentSub(account.id)}>
-                            Grant sub
-                          </button>
                           {account.verifiedBadge ? (
                             <button type="button" onClick={() => revokeBadge(account.id)}>
                               Revoke badge
@@ -205,11 +201,9 @@ export function AdminAccounts() {
                           )}
                         </>
                       )}
-                      {account.role !== 'Agent' && (
-                        <button type="button">
-                          {account.status === 'Active' ? 'Suspend' : 'Activate'}
-                        </button>
-                      )}
+                      <button type="button">
+                        {account.status === 'Active' ? 'Suspend' : 'Activate'}
+                      </button>
                     </div>
                   </td>
                 </tr>

@@ -1,4 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import './data/partnerRegistry'
+import './data/dealerBadges'
 import { AdminAccounts } from './admin/AdminAccounts'
 import { AdminAnalytics } from './admin/AdminAnalytics'
 import { AdminAnnouncements } from './admin/AdminAnnouncements'
@@ -25,11 +27,13 @@ import { LenderApplications } from './lender/LenderApplications'
 import { LenderLayout } from './lender/LenderLayout'
 import { LenderOverview } from './lender/LenderOverview'
 import { LenderProfile } from './lender/LenderProfile'
+import { LenderSubscription } from './lender/LenderSubscription'
 import { Layout } from './components/Layout'
 import { Browse } from './pages/Browse'
 import { CarDetail } from './pages/CarDetail'
 import { DealerDetail } from './pages/DealerDetail'
 import { Dealers } from './pages/Dealers'
+import { About } from './pages/About'
 import { Architecture } from './pages/Architecture'
 import { Home } from './pages/Home'
 import { Join } from './pages/Join'
@@ -74,6 +78,7 @@ export default function App() {
           <Route index element={<LenderOverview />} />
           <Route path="applications" element={<LenderApplications />} />
           <Route path="analytics" element={<LenderAnalytics />} />
+          <Route path="subscription" element={<LenderSubscription />} />
           <Route path="profile" element={<LenderProfile />} />
         </Route>
 
@@ -88,6 +93,7 @@ export default function App() {
           <Route path="loans" element={<Loans />} />
           <Route path="pricing" element={<Pricing />} />
           <Route path="join" element={<Join />} />
+          <Route path="about" element={<About />} />
           <Route path="architecture" element={<Architecture />} />
           <Route path="report" element={<ReportAccount />} />
           <Route path="messages" element={<Messages />} />

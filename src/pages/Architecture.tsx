@@ -126,9 +126,9 @@ export function Architecture() {
           </ol>
 
           <p className="arch-note">
-            Today the demo app runs in the browser with local storage for speed. The target
-            production shape follows this stack: API + backend + auth + PostgreSQL (Neon) + blob
-            file storage + hosted infrastructure with security and monitoring.
+            The app currently uses the browser and local storage for speed. The target production
+            shape follows this stack: API + backend + auth + PostgreSQL (Neon) + blob file storage
+            + hosted infrastructure with security and monitoring.
           </p>
         </div>
       </div>

@@ -53,10 +53,10 @@ export function Rentals() {
 
         <div className="rentals-intro panel-card">
           <div>
-            <h1>Hire a car in Kenya</h1>
+            <h1>Car hire on Kenya&apos;s largest marketplace</h1>
             <p>
-              Browse hire cars listed by dealers — self-drive or with a driver. Book daily or weekly
-              from Nairobi, Mombasa, Nakuru and more.
+              Self-drive or with a driver — book daily or weekly hire cars from dealers across
+              Nairobi, Mombasa, Nakuru and more.
             </p>
           </div>
           <Link to="/login?next=/dealer/rentals" className="btn btn-primary">

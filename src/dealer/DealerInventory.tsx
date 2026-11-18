@@ -9,6 +9,9 @@ import {
   subscribeCars,
   updateCar,
 } from '../data/cars'
+import { dealerCanListInventory } from '../data/dealerAccess'
+import { subscribeBilling } from '../data/billing'
+import { subscribePlatformSettings } from '../data/platformSettings'
 import type { BodyType, Car, Dealer } from '../data/types'
 import { ListingImageUploader } from './ListingImageUploader'
 
@@ -87,6 +90,7 @@ export function DealerInventory() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [draft, setDraft] = useState<Draft>(() => emptyDraft(dealer, session.city))
   const [toast, setToast] = useState('')
+  const [listAccess, setListAccess] = useState(() => dealerCanListInventory(session.accountId))
 
   useEffect(() => {
     if (!dealerId) return
@@ -94,6 +98,17 @@ export function DealerInventory() {
     refresh()
     return subscribeCars(refresh)
   }, [dealerId])
+
+  useEffect(() => {
+    const refresh = () => setListAccess(dealerCanListInventory(session.accountId))
+    refresh()
+    const offPay = subscribePlatformSettings(refresh)
+    const offBill = subscribeBilling(refresh)
+    return () => {
+      offPay()
+      offBill()
+    }
+  }, [session.accountId])
 
   const filtered = useMemo(() => {
     return stock.filter((car) => {
@@ -108,6 +123,12 @@ export function DealerInventory() {
   }
 
   function openAdd() {
+    const access = dealerCanListInventory(session.accountId)
+    setListAccess(access)
+    if (!access.allowed) {
+      flash(access.message)
+      return
+    }
     setMode('add')
     setEditingId(null)
     setDraft(emptyDraft(dealer, session.city))
@@ -131,6 +152,14 @@ export function DealerInventory() {
   function onSave(e: FormEvent) {
     e.preventDefault()
     if (!dealerId || !draft.model.trim()) return
+    if (mode === 'add') {
+      const access = dealerCanListInventory(session.accountId)
+      setListAccess(access)
+      if (!access.allowed) {
+        flash(access.message)
+        return
+      }
+    }
     const features = draft.featuresText
       .split(',')
       .map((f) => f.trim())
@@ -195,6 +224,9 @@ export function DealerInventory() {
           <h2>Your car listings</h2>
           <p style={{ margin: '0.2rem 0 0', color: '#64748b', fontSize: '0.85rem' }}>
             Stock live on Kenya Vehicles under {session.name}
+            {listAccess.allowed
+              ? ' · Unlimited listings'
+              : ' · Payment required to add listings'}
           </p>
         </div>
         <div className="admin-toolbar-actions">
@@ -207,12 +239,27 @@ export function DealerInventory() {
             type="button"
             className="admin-btn admin-btn-primary"
             onClick={() => (mode === 'add' ? closeForm() : openAdd())}
+            disabled={mode !== 'add' && !listAccess.allowed}
           >
             {mode === 'add' ? 'Close form' : 'Add listing'}
           </button>
           <span className="admin-btn admin-btn-ghost">{filtered.length} cars</span>
         </div>
       </div>
+
+      {!listAccess.allowed && (
+        <section className="admin-panel" style={{ marginBottom: '1rem' }}>
+          <div className="admin-panel-head">
+            <div>
+              <h2>Subscription required</h2>
+              <p>{listAccess.message}</p>
+            </div>
+            <Link to="/dealer/subscription" className="admin-btn admin-btn-primary">
+              Pay KES 2,000/month to post
+            </Link>
+          </div>
+        </section>
+      )}
 
       {mode !== 'closed' && (
         <section className="admin-panel" style={{ marginBottom: '1rem' }}>

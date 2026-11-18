@@ -95,8 +95,8 @@ export function Loans() {
       <div className="container">
         <div className="loans-head fade-up">
           <div>
-            <p className="eyebrow">Car financing</p>
-            <h1>Compare car loans in Kenya</h1>
+            <p className="eyebrow">Finance on Kenya Vehicles</p>
+            <h1>Compare car loans while you shop</h1>
             <p>
               Banks, saccos, microfinance, and fintechs — all on Kenya Vehicles so you can fund a
               car from any dealer without shopping rates alone.

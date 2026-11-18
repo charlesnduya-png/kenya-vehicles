@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Navigate, Outlet, useLocation } from 'react-router-dom'
+import { BillingStatusBanner } from '../components/BillingStatusBanner'
 import { getSession, logout, subscribeAuth, type AuthSession } from '../data/auth'
+import { subscribeBilling } from '../data/billing'
+import { getPartnerBillingAccess } from '../data/billingAccess'
 import { subscribeEnquiries } from '../data/enquiries'
 import { getLoanPartner, subscribeLoanPartners } from '../data/loans'
 import {
@@ -8,6 +11,7 @@ import {
   getLenderBadges,
   getLenderNotificationTotal,
 } from '../data/notifications'
+import { subscribePlatformSettings } from '../data/platformSettings'
 import '../admin/admin.css'
 
 const groups = [
@@ -21,7 +25,10 @@ const groups = [
   },
   {
     label: 'Account',
-    items: [{ to: '/lender/profile', label: 'Partner profile', icon: 'bank' }],
+    items: [
+      { to: '/lender/subscription', label: 'Subscription', icon: 'bank' },
+      { to: '/lender/profile', label: 'Partner profile', icon: 'bank' },
+    ],
   },
 ]
 
@@ -29,6 +36,7 @@ const titles: Record<string, { eyebrow: string; title: string }> = {
   '/lender': { eyebrow: 'Loan agent portal', title: 'Partner overview' },
   '/lender/applications': { eyebrow: 'Pipeline', title: 'Loan applications' },
   '/lender/analytics': { eyebrow: 'Insights', title: 'Loan analysis' },
+  '/lender/subscription': { eyebrow: 'Billing', title: 'Subscription plan' },
   '/lender/profile': { eyebrow: 'Account', title: 'Partner profile' },
 }
 
@@ -87,11 +95,17 @@ export function LenderLayout() {
   const [session, setSession] = useState<AuthSession | null>(() => getSession())
   const [partnerTick, setPartnerTick] = useState(0)
   const [notifyTick, setNotifyTick] = useState(0)
+  const [billingTick, setBillingTick] = useState(0)
   const meta = titles[pathname] ?? { eyebrow: 'Loan agent portal', title: 'Kenya Vehicles' }
 
   useEffect(() => subscribeAuth(() => setSession(getSession())), [])
   useEffect(() => subscribeLoanPartners(() => setPartnerTick((n) => n + 1)), [])
   useEffect(() => subscribeEnquiries(() => setNotifyTick((n) => n + 1)), [])
+  useEffect(() => {
+    const refresh = () => setBillingTick((n) => n + 1)
+    const offs = [subscribeBilling(refresh), subscribePlatformSettings(refresh)]
+    return () => offs.forEach((off) => off())
+  }, [])
 
   const badges = useMemo(() => {
     void notifyTick
@@ -102,6 +116,11 @@ export function LenderLayout() {
     void notifyTick
     return session?.loanPartnerId ? getLenderNotificationTotal(session.loanPartnerId) : 0
   }, [session?.loanPartnerId, notifyTick])
+
+  const billingAccess = useMemo(() => {
+    void billingTick
+    return getPartnerBillingAccess(session?.accountId, 'lender')
+  }, [session?.accountId, billingTick])
 
   if (!session) return <Navigate to="/login?next=/lender" replace />
   if (session.role !== 'Loan partner') return <Navigate to="/" replace />
@@ -240,7 +259,8 @@ export function LenderLayout() {
         </header>
 
         <div className="admin-content">
-          <Outlet context={{ session, partner }} />
+          <BillingStatusBanner access={billingAccess} payPath="/lender/subscription" />
+          <Outlet context={{ session, partner, billingAccess }} />
         </div>
       </div>
     </div>

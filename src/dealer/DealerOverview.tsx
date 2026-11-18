@@ -48,7 +48,7 @@ export function DealerOverview() {
         </article>
         <article className="admin-kpi">
           <span>Subscription</span>
-          <strong style={{ fontSize: '1.15rem' }}>{session.plan ?? 'Starter'}</strong>
+          <strong style={{ fontSize: '1.15rem' }}>{session.plan ?? 'Dealer'}</strong>
           <em>
             <Link to="/dealer/subscription">Manage plan</Link>
           </em>

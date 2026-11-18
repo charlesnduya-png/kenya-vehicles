@@ -91,6 +91,30 @@
   font-weight: 700;
 }
 
+.join-email-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.join-email-row .btn {
+  white-space: nowrap;
+}
+
+.join-error {
+  margin-top: 0.75rem;
+  color: #b42318;
+  font-size: 0.9rem;
+}
+
+.join-info,
+.join-verify-ok {
+  margin-top: 0.75rem;
+  color: #067647;
+  font-size: 0.9rem;
+}
+
 @media (max-width: 860px) {
   .join-layout {
     grid-template-columns: 1fr;

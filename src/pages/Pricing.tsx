@@ -1,17 +1,33 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  agentBadgeProducts,
+  SUBSCRIPTION_PRICE_KES,
   dealerPlans,
   formatBillingKES,
 } from '../data/billing'
+import {
+  VERIFIED_BADGE_DURATION_MONTHS,
+  verifiedBadgeProduct,
+} from '../data/dealerBadges'
+import {
+  getPlatformSettings,
+  subscribePlatformSettings,
+} from '../data/platformSettings'
 import './Pricing.css'
 
 export function Pricing() {
-  const [selectedPlan, setSelectedPlan] = useState('plan-growth')
-  const [selectedBadge, setSelectedBadge] = useState('badge-monthly')
+  const [selectedPlan, setSelectedPlan] = useState(dealerPlans[0]?.id ?? 'plan-dealer')
   const [dealerDone, setDealerDone] = useState(false)
   const [badgeDone, setBadgeDone] = useState(false)
+  const [paymentsRequired, setPaymentsRequired] = useState(
+    () => getPlatformSettings().paymentsRequired,
+  )
+
+  useEffect(() => {
+    const refresh = () => setPaymentsRequired(getPlatformSettings().paymentsRequired)
+    refresh()
+    return subscribePlatformSettings(refresh)
+  }, [])
 
   return (
     <section className="section pricing-page">
@@ -24,21 +40,28 @@ export function Pricing() {
 
         <div className="pricing-hero panel-card">
           <div>
-            <h1>Subscriptions &amp; verified badges</h1>
+            <h1>Dealer plans &amp; verified badge</h1>
             <p>
-              Dealers run on monthly plans. Agents can buy a Verified Badge so buyers trust them
-              faster — both managed from the Kenya Vehicles platform.
+              One dealer account for yards and brokers. Create free, then pay{' '}
+              {formatBillingKES(SUBSCRIPTION_PRICE_KES)}/month only to post listings. Buy a Verified
+              Badge from your account — renews every {VERIFIED_BADGE_DURATION_MONTHS} months.
+              {!paymentsRequired &&
+                ' Right now payments are off — dealers can list for free until admin turns them on.'}
             </p>
           </div>
           <Link to="/join" className="btn btn-primary">
-            Open partner application
+            Create free dealer account
           </Link>
         </div>
 
         <div className="pricing-block">
           <div className="pricing-block-head">
-            <h2>Dealer monthly subscriptions</h2>
-            <p>Required for dealer accounts listing cars for sale on Kenya Vehicles.</p>
+            <h2>Monthly listing subscription</h2>
+            <p>
+              {paymentsRequired
+                ? 'Accounts are free. This monthly plan unlocks posting sale and hire cars.'
+                : 'Standard monthly plan — posting is free while the payment switch is off.'}
+            </p>
           </div>
           <div className="pricing-grid">
             {dealerPlans.map((plan) => (
@@ -46,18 +69,13 @@ export function Pricing() {
                 key={plan.id}
                 className={`pricing-card ${plan.popular ? 'is-popular' : ''} ${selectedPlan === plan.id ? 'is-selected' : ''}`}
               >
-                {plan.popular && <span className="pricing-tag">Most popular</span>}
+                {plan.popular && <span className="pricing-tag">Dealers</span>}
                 <h3>{plan.name}</h3>
                 <p className="pricing-amount">
                   {formatBillingKES(plan.monthlyPrice)}
                   <small>/ month</small>
                 </p>
-                <p className="pricing-limit">
-                  {plan.listingLimit === 'Unlimited'
-                    ? 'Unlimited listings'
-                    : `Up to ${plan.listingLimit} listings`}{' '}
-                  · {plan.featuredSlots} featured
-                </p>
+                <p className="pricing-limit">Unlimited listings · {plan.featuredSlots} featured</p>
                 <ul>
                   {plan.perks.map((perk) => (
                     <li key={perk}>{perk}</li>
@@ -78,53 +96,45 @@ export function Pricing() {
           </div>
           {dealerDone && (
             <div className="pricing-confirm">
-              Dealer plan reserved — continue on{' '}
-              <Link to="/join">Join as a dealer</Link> to activate billing.
+              Plan noted — <Link to="/join">create your free dealer account</Link>, then pay from
+              Subscription when you post.
             </div>
           )}
         </div>
 
         <div className="pricing-block">
           <div className="pricing-block-head">
-            <h2>Agent verified badge</h2>
+            <h2>Verified dealer badge</h2>
             <p>
-              Independent agents and brokers can purchase a Verified Badge. It shows on their
-              profile and builds buyer confidence.
+              Optional trust badge for any dealer account. Buy or renew inside Dealer → Subscription.
+              Valid for {VERIFIED_BADGE_DURATION_MONTHS} months, then renew.
             </p>
           </div>
           <div className="pricing-grid pricing-grid-2">
-            {agentBadgeProducts.map((product) => (
-              <article
-                key={product.id}
-                className={`pricing-card ${selectedBadge === product.id ? 'is-selected' : ''}`}
+            <article className={`pricing-card ${badgeDone ? 'is-selected' : ''}`}>
+              <h3>{verifiedBadgeProduct.name}</h3>
+              <p className="pricing-amount">
+                {formatBillingKES(verifiedBadgeProduct.price)}
+                <small>/ {VERIFIED_BADGE_DURATION_MONTHS} months</small>
+              </p>
+              <ul>
+                {verifiedBadgeProduct.perks.map((perk) => (
+                  <li key={perk}>{perk}</li>
+                ))}
+              </ul>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => setBadgeDone(true)}
               >
-                <h3>{product.name}</h3>
-                <p className="pricing-amount">
-                  {formatBillingKES(product.price)}
-                  <small>/ {product.billing === 'Monthly' ? 'month' : 'year'}</small>
-                </p>
-                <ul>
-                  {product.perks.map((perk) => (
-                    <li key={perk}>{perk}</li>
-                  ))}
-                </ul>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() => {
-                    setSelectedBadge(product.id)
-                    setBadgeDone(true)
-                  }}
-                >
-                  {selectedBadge === product.id && badgeDone ? 'Selected' : 'Buy verified badge'}
-                </button>
-              </article>
-            ))}
+                {badgeDone ? 'Selected' : 'Get verified badge'}
+              </button>
+            </article>
           </div>
           {badgeDone && (
             <div className="pricing-confirm">
-              Badge package selected — complete checkout from{' '}
-              <Link to="/join#agents">Join as an agent</Link>.
+              After you join, open <Link to="/login">Dealer → Subscription</Link> to buy or renew
+              the badge with M-Pesa.
             </div>
           )}
         </div>

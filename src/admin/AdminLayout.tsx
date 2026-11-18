@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { logout } from '../data/auth'
+import { NavLink, Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { getSession, logout, subscribeAuth, type AuthSession } from '../data/auth'
 import {
   formatBadgeCount,
   getAdminBadges,
@@ -158,9 +158,11 @@ function NavIcon({ name }: { name: string }) {
 export function AdminLayout() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
+  const [session, setSession] = useState<AuthSession | null>(() => getSession())
   const [notifyTick, setNotifyTick] = useState(0)
   const meta = titles[pathname] ?? { eyebrow: 'Admin', title: 'Kenya Vehicles' }
 
+  useEffect(() => subscribeAuth(() => setSession(getSession())), [])
   useEffect(() => subscribeReports(() => setNotifyTick((n) => n + 1)), [])
 
   const badges = useMemo(() => {
@@ -175,8 +177,11 @@ export function AdminLayout() {
 
   function signOut() {
     logout()
-    navigate('/login', { replace: true })
+    navigate('/login?next=/admin', { replace: true })
   }
+
+  if (!session) return <Navigate to="/login?next=/admin" replace />
+  if (session.role !== 'Admin') return <Navigate to="/login?next=/admin" replace />
 
   return (
     <div className="admin-shell">
@@ -276,7 +281,7 @@ export function AdminLayout() {
             <div className="admin-user">
               <span className="admin-avatar">A</span>
               <div>
-                <strong>Platform Admin</strong>
+                <strong>{session.name}</strong>
                 <small>Superuser · Nairobi</small>
               </div>
             </div>

@@ -17,16 +17,17 @@ export function Footer() {
         <div className="container amz-footer-grid">
           <div>
             <h4>Get to Know Us</h4>
-            <Link to="/dealers">About Kenya Vehicles Dealers</Link>
-            <Link to="/architecture">Platform architecture</Link>
-            <Link to="/join">Careers &amp; Partnerships</Link>
-            <a href="mailto:hello@kenyavehicles.co.ke">Contact Kenya Vehicles</a>
+            <Link to="/about#about-dealers">About Kenya Vehicles Dealers</Link>
+            <Link to="/about#architecture">Platform architecture</Link>
+            <Link to="/about#careers">Careers &amp; Partnerships</Link>
+            <Link to="/about#contact">Contact Kenya Vehicles</Link>
+            <a href="tel:+254792268513">Call 0792 268 513</a>
           </div>
           <div>
             <h4>Make Money with Us</h4>
             <Link to="/join">Sell cars on Kenya Vehicles</Link>
             <Link to="/pricing">Dealer subscriptions</Link>
-            <Link to="/join#agents">Buy agent verified badge</Link>
+            <Link to="/pricing">Buy verified dealer badge</Link>
             <Link to="/join#lenders">Offer car loans</Link>
           </div>
           <div>
@@ -42,15 +43,15 @@ export function Footer() {
             <Link to="/dealers">Find a yard near you</Link>
             <Link to="/report">Report an account</Link>
             <Link to="/login">Dealer sign in</Link>
-            <Link to="/admin">Admin console</Link>
-            <span>Help: support@kenyavehicles.co.ke</span>
+            <a href="tel:+254792268513">Help: 0792 268 513</a>
+            <span>Email: support@kenyavehicles.co.ke</span>
           </div>
         </div>
       </div>
 
       <div className="amz-footer-brand">
         <BrandLogo />
-        <p>Kenya&apos;s multi-dealer car marketplace · Prices in KES</p>
+        <p>Kenya&apos;s largest car marketplace — buy, hire &amp; finance · Prices in KES</p>
       </div>
 
       <div className="amz-footer-legal">

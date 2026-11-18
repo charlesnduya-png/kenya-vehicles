@@ -127,7 +127,7 @@ export function Browse() {
                 <h1>
                   {filtered.length} results{q ? ` for "${q}"` : ''}
                 </h1>
-                <p>Cars from Kenya Vehicles dealers across Kenya</p>
+                <p>Kenya&apos;s largest car marketplace — stock from verified dealers nationwide</p>
               </div>
               <div className="field">
                 <label htmlFor="sort">Sort by</label>

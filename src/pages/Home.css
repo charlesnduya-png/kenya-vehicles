@@ -28,6 +28,14 @@
   font-size: 1.25rem;
 }
 
+.amz-empty {
+  margin: 0;
+  color: var(--muted, #565959);
+  font-size: 0.95rem;
+  line-height: 1.45;
+  grid-column: 1 / -1;
+}
+
 .amz-promo-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

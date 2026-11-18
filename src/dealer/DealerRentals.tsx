@@ -2,6 +2,9 @@ import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import type { AuthSession } from '../data/auth'
 import { formatKES } from '../data/cars'
+import { subscribeBilling } from '../data/billing'
+import { dealerCanListInventory } from '../data/dealerAccess'
+import { subscribePlatformSettings } from '../data/platformSettings'
 import {
   addRental,
   getRentalsByDealer,
@@ -95,6 +98,7 @@ export function DealerRentals() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [draft, setDraft] = useState<Draft>(() => emptyDraft(dealer, session.city))
   const [toast, setToast] = useState('')
+  const [listAccess, setListAccess] = useState(() => dealerCanListInventory(session.accountId))
 
   useEffect(() => {
     if (!dealerId) return
@@ -102,6 +106,17 @@ export function DealerRentals() {
     refresh()
     return subscribeRentals(refresh)
   }, [dealerId])
+
+  useEffect(() => {
+    const refresh = () => setListAccess(dealerCanListInventory(session.accountId))
+    refresh()
+    const offPay = subscribePlatformSettings(refresh)
+    const offBill = subscribeBilling(refresh)
+    return () => {
+      offPay()
+      offBill()
+    }
+  }, [session.accountId])
 
   const filtered = useMemo(() => {
     return rows.filter((car) => {
@@ -116,6 +131,12 @@ export function DealerRentals() {
   }
 
   function openAdd() {
+    const access = dealerCanListInventory(session.accountId)
+    setListAccess(access)
+    if (!access.allowed) {
+      flash(access.message)
+      return
+    }
     setMode('add')
     setEditingId(null)
     setDraft(emptyDraft(dealer, session.city))
@@ -139,6 +160,14 @@ export function DealerRentals() {
   function onSave(e: FormEvent) {
     e.preventDefault()
     if (!dealerId || !draft.model.trim()) return
+    if (mode === 'add') {
+      const access = dealerCanListInventory(session.accountId)
+      setListAccess(access)
+      if (!access.allowed) {
+        flash(access.message)
+        return
+      }
+    }
     const includes = draft.includesText
       .split(',')
       .map((item) => item.trim())
@@ -211,6 +240,7 @@ export function DealerRentals() {
           <h2>Your rental fleet</h2>
           <p style={{ margin: '0.2rem 0 0', color: '#64748b', fontSize: '0.85rem' }}>
             Add and edit hire cars — buyers book them on Car Rental
+            {listAccess.allowed ? ' · Unlimited listings' : ' · Payment required to add listings'}
           </p>
         </div>
         <div className="admin-toolbar-actions">
@@ -223,12 +253,27 @@ export function DealerRentals() {
             type="button"
             className="admin-btn admin-btn-primary"
             onClick={() => (mode === 'add' ? closeForm() : openAdd())}
+            disabled={mode !== 'add' && !listAccess.allowed}
           >
             {mode === 'add' ? 'Close form' : 'Add listing'}
           </button>
           <span className="admin-btn admin-btn-ghost">{filtered.length} rentals</span>
         </div>
       </div>
+
+      {!listAccess.allowed && (
+        <section className="admin-panel" style={{ marginBottom: '1rem' }}>
+          <div className="admin-panel-head">
+            <div>
+              <h2>Subscription required</h2>
+              <p>{listAccess.message}</p>
+            </div>
+            <Link to="/dealer/subscription" className="admin-btn admin-btn-primary">
+              Pay KES 2,000/month to post
+            </Link>
+          </div>
+        </section>
+      )}
 
       {mode !== 'closed' && (
         <section className="admin-panel" style={{ marginBottom: '1rem' }}>

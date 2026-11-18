@@ -1,0 +1,111 @@
+.about-page {
+  padding-bottom: 3rem;
+}
+
+.about-hero {
+  margin-bottom: 1.25rem;
+}
+
+.about-hero h1 {
+  margin: 0.2rem 0 0.45rem;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  letter-spacing: -0.03em;
+}
+
+.about-hero p {
+  margin: 0;
+  max-width: 42rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.about-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.1rem;
+  margin-bottom: 1.25rem;
+  padding: 0.85rem 1rem;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.about-nav a {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.about-nav a:hover {
+  color: var(--link-hover);
+  text-decoration: underline;
+}
+
+.about-block {
+  margin-bottom: 0.85rem;
+  padding: 1.15rem 1.2rem;
+  scroll-margin-top: 5rem;
+}
+
+.about-block h2 {
+  margin: 0 0 0.55rem;
+  font-size: 1.2rem;
+}
+
+.about-block p {
+  margin: 0 0 0.65rem;
+  color: var(--muted);
+  line-height: 1.55;
+  max-width: 46rem;
+}
+
+.about-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.about-contact-list {
+  margin: 0.85rem 0 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.about-contact-list div {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.about-contact-list dt {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.about-contact-list dd {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.about-contact-list a {
+  text-decoration: none;
+}
+
+.about-contact-list a:hover {
+  text-decoration: underline;
+  color: var(--link-hover);
+}
+
+@media (max-width: 520px) {
+  .about-contact-list div {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+}

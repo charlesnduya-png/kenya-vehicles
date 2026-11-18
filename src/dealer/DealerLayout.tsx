@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { NavLink, Navigate, Outlet, useLocation } from 'react-router-dom'
+import { BillingStatusBanner } from '../components/BillingStatusBanner'
 import { getSession, logout, subscribeAuth, type AuthSession } from '../data/auth'
+import { getPartnerBillingAccess } from '../data/billingAccess'
+import { subscribeBilling } from '../data/billing'
 import { getDealer, subscribeDealerLogos } from '../data/dealers'
 import { subscribeEnquiries } from '../data/enquiries'
 import { subscribeMessages } from '../data/messages'
@@ -10,6 +13,7 @@ import {
   getDealerNotificationTotal,
 } from '../data/notifications'
 import { subscribeOffers } from '../data/offers'
+import { subscribePlatformSettings } from '../data/platformSettings'
 import '../admin/admin.css'
 
 const groups = [
@@ -127,10 +131,16 @@ export function DealerLayout() {
   const [session, setSession] = useState<AuthSession | null>(() => getSession())
   const [logoTick, setLogoTick] = useState(0)
   const [notifyTick, setNotifyTick] = useState(0)
+  const [billingTick, setBillingTick] = useState(0)
   const meta = titles[pathname] ?? { eyebrow: 'Dealer portal', title: 'Kenya Vehicles' }
 
   useEffect(() => subscribeAuth(() => setSession(getSession())), [])
   useEffect(() => subscribeDealerLogos(() => setLogoTick((n) => n + 1)), [])
+  useEffect(() => {
+    const refresh = () => setBillingTick((n) => n + 1)
+    const offs = [subscribeBilling(refresh), subscribePlatformSettings(refresh)]
+    return () => offs.forEach((off) => off())
+  }, [])
   useEffect(() => {
     const refresh = () => setNotifyTick((n) => n + 1)
     const offs = [subscribeEnquiries(refresh), subscribeOffers(refresh), subscribeMessages(refresh)]
@@ -146,6 +156,11 @@ export function DealerLayout() {
     void notifyTick
     return session?.dealerId ? getDealerNotificationTotal(session.dealerId) : 0
   }, [session?.dealerId, notifyTick])
+
+  const billingAccess = useMemo(() => {
+    void billingTick
+    return getPartnerBillingAccess(session?.accountId, 'dealer')
+  }, [session?.accountId, billingTick])
 
   if (!session) return <Navigate to="/login?next=/dealer" replace />
   if (session.role !== 'Dealer') return <Navigate to="/" replace />
@@ -281,7 +296,8 @@ export function DealerLayout() {
         </header>
 
         <div className="admin-content">
-          <Outlet context={{ session, dealer }} />
+          <BillingStatusBanner access={billingAccess} payPath="/dealer/subscription" />
+          <Outlet context={{ session, dealer, billingAccess }} />
         </div>
       </div>
     </div>
