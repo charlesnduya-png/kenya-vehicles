@@ -19,6 +19,18 @@ npm run dev
 
 Open the URL Vite prints (usually `http://localhost:5173`).
 
+## Deploy on Render
+
+One-click deploy (uses `render.yaml`):
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/charlesnduya-png/kenya-vehicles)
+
+Repo: https://github.com/charlesnduya-png/kenya-vehicles
+
+After deploy, the live site is typically:
+
+`https://kenya-vehicles.onrender.com`
+
 ## Stack
 
 - React + TypeScript
