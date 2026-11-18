@@ -30,6 +30,7 @@ import { Browse } from './pages/Browse'
 import { CarDetail } from './pages/CarDetail'
 import { DealerDetail } from './pages/DealerDetail'
 import { Dealers } from './pages/Dealers'
+import { Architecture } from './pages/Architecture'
 import { Home } from './pages/Home'
 import { Join } from './pages/Join'
 import { Loans } from './pages/Loans'
@@ -87,6 +88,7 @@ export default function App() {
           <Route path="loans" element={<Loans />} />
           <Route path="pricing" element={<Pricing />} />
           <Route path="join" element={<Join />} />
+          <Route path="architecture" element={<Architecture />} />
           <Route path="report" element={<ReportAccount />} />
           <Route path="messages" element={<Messages />} />
           <Route path="login" element={<Login />} />

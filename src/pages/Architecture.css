@@ -1,0 +1,143 @@
+.arch-page {
+  padding-bottom: 3rem;
+}
+
+.arch-hero {
+  margin-bottom: 1.75rem;
+}
+
+.arch-hero h1 {
+  margin: 0.2rem 0 0.45rem;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  letter-spacing: -0.03em;
+}
+
+.arch-hero p {
+  margin: 0;
+  max-width: 46rem;
+  color: var(--muted, #565959);
+  line-height: 1.55;
+}
+
+.arch-layers {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.arch-layer {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 0.85rem;
+  align-items: start;
+  padding: 1rem 1.1rem;
+}
+
+.arch-layer-num {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #0f172a;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.arch-layer h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+}
+
+.arch-layer p {
+  margin: 0;
+  color: var(--muted, #565959);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.arch-flow {
+  margin-top: 0.5rem;
+}
+
+.arch-flow-head {
+  margin-bottom: 1rem;
+}
+
+.arch-flow-head h2 {
+  margin: 0.15rem 0 0.35rem;
+  font-size: 1.35rem;
+}
+
+.arch-flow-head p {
+  margin: 0;
+  color: var(--muted, #565959);
+  max-width: 40rem;
+}
+
+.arch-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+  counter-reset: arch-step;
+}
+
+.arch-steps li {
+  counter-increment: arch-step;
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 0.85rem;
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid var(--border, #e5e7eb);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.arch-steps li::before {
+  content: counter(arch-step);
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #ecfeff;
+  color: #0f766e;
+  font-weight: 800;
+  border: 1px solid #a5f3fc;
+}
+
+.arch-steps strong {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.98rem;
+}
+
+.arch-steps span {
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.arch-note {
+  margin-top: 1.25rem;
+  padding: 0.95rem 1.1rem;
+  border-radius: 12px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .arch-layer,
+  .arch-steps li {
+    grid-template-columns: 2.4rem 1fr;
+    gap: 0.65rem;
+    padding: 0.85rem 0.9rem;
+  }
+}

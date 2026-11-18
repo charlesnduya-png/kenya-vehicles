@@ -18,6 +18,7 @@ export function Footer() {
           <div>
             <h4>Get to Know Us</h4>
             <Link to="/dealers">About Kenya Vehicles Dealers</Link>
+            <Link to="/architecture">Platform architecture</Link>
             <Link to="/join">Careers &amp; Partnerships</Link>
             <a href="mailto:hello@kenyavehicles.co.ke">Contact Kenya Vehicles</a>
           </div>
