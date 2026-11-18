@@ -10,7 +10,7 @@ import {
   updateRental,
 } from '../data/rentals'
 import type { BodyType, Dealer, RentalCar } from '../data/types'
-import { ListingImagesField } from './ListingImagesField'
+import { ListingImageUploader } from './ListingImageUploader'
 
 type Ctx = { session: AuthSession; dealer?: Dealer }
 
@@ -139,14 +139,15 @@ export function DealerRentals() {
   function onSave(e: FormEvent) {
     e.preventDefault()
     if (!dealerId || !draft.model.trim()) return
-    if (draft.images.length === 0) {
-      flash('Add at least one photo')
-      return
-    }
     const includes = draft.includesText
       .split(',')
       .map((item) => item.trim())
       .filter(Boolean)
+    const images = draft.images.length
+      ? draft.images
+      : [
+          'https://upload.wikimedia.org/wikipedia/commons/5/55/2016_Toyota_Corolla_Axio_Hybrid_sedan_front.jpg',
+        ]
 
     if (mode === 'edit' && editingId) {
       updateRental(editingId, dealerId, {
@@ -168,7 +169,7 @@ export function DealerRentals() {
         available: draft.available,
         description: draft.description,
         includes,
-        images: draft.images,
+        images,
       })
       flash('Hire listing updated')
     } else {
@@ -194,7 +195,7 @@ export function DealerRentals() {
           draft.description.trim() ||
           `${draft.year} ${draft.make} ${draft.model} for hire from ${dealer?.name ?? session.name}.`,
         includes,
-        images: draft.images,
+        images,
       })
       flash('Hire car listed on Kenya Vehicles')
     }
@@ -401,7 +402,7 @@ export function DealerRentals() {
               />
             </div>
 
-            <ListingImagesField
+            <ListingImageUploader
               images={draft.images}
               onChange={(images) => patchDraft('images', images)}
               label="Hire car photos"

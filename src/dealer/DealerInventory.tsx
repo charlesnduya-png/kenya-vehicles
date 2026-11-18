@@ -10,7 +10,7 @@ import {
   updateCar,
 } from '../data/cars'
 import type { BodyType, Car, Dealer } from '../data/types'
-import { ListingImagesField } from './ListingImagesField'
+import { ListingImageUploader } from './ListingImageUploader'
 
 type Ctx = { session: AuthSession; dealer?: Dealer }
 
@@ -135,11 +135,11 @@ export function DealerInventory() {
       .split(',')
       .map((f) => f.trim())
       .filter(Boolean)
-
-    if (draft.images.length === 0) {
-      flash('Add at least one photo')
-      return
-    }
+    const images = draft.images.length
+      ? draft.images
+      : [
+          'https://upload.wikimedia.org/wikipedia/commons/5/55/2016_Toyota_Corolla_Axio_Hybrid_sedan_front.jpg',
+        ]
 
     if (mode === 'edit' && editingId) {
       updateCar(editingId, dealerId, {
@@ -158,7 +158,7 @@ export function DealerInventory() {
         featured: draft.featured,
         description: draft.description,
         features,
-        images: draft.images,
+        images,
       })
       flash('Listing updated')
     } else {
@@ -179,7 +179,7 @@ export function DealerInventory() {
         featured: draft.featured,
         description: draft.description,
         features,
-        images: draft.images,
+        images,
       })
       flash('Listing published')
     }
@@ -384,7 +384,7 @@ export function DealerInventory() {
               />
             </div>
 
-            <ListingImagesField
+            <ListingImageUploader
               images={draft.images}
               onChange={(images) => patchDraft('images', images)}
               label="Car photos"
