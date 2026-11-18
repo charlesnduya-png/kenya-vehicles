@@ -1,16 +1,20 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatKES } from '../data/cars'
-import { getRentalOwner, rentalCars } from '../data/rentals'
+import { getDealer } from '../data/dealers'
+import { getRentals, subscribeRentals } from '../data/rentals'
 
 export function AdminRentals() {
   const [q, setQ] = useState('')
   const [status, setStatus] = useState('All')
+  const [fleet, setFleet] = useState(() => getRentals())
+
+  useEffect(() => subscribeRentals(() => setFleet(getRentals())), [])
 
   const filtered = useMemo(() => {
-    return rentalCars.filter((car) => {
-      const owner = getRentalOwner(car.ownerId)
-      const hay = `${car.make} ${car.model} ${owner?.name ?? ''} ${car.city}`.toLowerCase()
+    return fleet.filter((car) => {
+      const dealer = getDealer(car.dealerId)
+      const hay = `${car.make} ${car.model} ${dealer?.name ?? ''} ${car.city}`.toLowerCase()
       const matchesQ = !q || hay.includes(q.toLowerCase())
       const matchesStatus =
         status === 'All' ||
@@ -18,7 +22,7 @@ export function AdminRentals() {
         (status === 'Booked' && !car.available)
       return matchesQ && matchesStatus
     })
-  }, [q, status])
+  }, [fleet, q, status])
 
   return (
     <>
@@ -26,7 +30,7 @@ export function AdminRentals() {
         <div>
           <h2>Car rental fleet</h2>
           <p style={{ margin: '0.2rem 0 0', color: '#64748b', fontSize: '0.85rem' }}>
-            Monitor hire cars, rates, and partner availability
+            Hire cars listed by dealers on Kenya Vehicles
           </p>
         </div>
         <div className="admin-toolbar-actions">
@@ -50,7 +54,7 @@ export function AdminRentals() {
             <thead>
               <tr>
                 <th>Vehicle</th>
-                <th>Owner</th>
+                <th>Dealer</th>
                 <th>City</th>
                 <th>Daily</th>
                 <th>Weekly</th>
@@ -62,7 +66,7 @@ export function AdminRentals() {
             </thead>
             <tbody>
               {filtered.map((car) => {
-                const owner = getRentalOwner(car.ownerId)
+                const dealer = getDealer(car.dealerId)
                 return (
                   <tr key={car.id}>
                     <td>
@@ -73,7 +77,15 @@ export function AdminRentals() {
                         {car.seats} seats · {car.transmission}
                       </div>
                     </td>
-                    <td>{owner?.name}</td>
+                    <td>
+                      {dealer ? (
+                        <Link to={`/dealers/${dealer.id}`} target="_blank">
+                          {dealer.name}
+                        </Link>
+                      ) : (
+                        car.dealerId
+                      )}
+                    </td>
                     <td>{car.city}</td>
                     <td className="mono">{formatKES(car.pricePerDay)}</td>
                     <td className="mono">{formatKES(car.pricePerWeek)}</td>
@@ -93,7 +105,6 @@ export function AdminRentals() {
                         <Link to={`/rentals/${car.id}`} target="_blank">
                           <button type="button">View</button>
                         </Link>
-                        <button type="button">Manage</button>
                       </div>
                     </td>
                   </tr>

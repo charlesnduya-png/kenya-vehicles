@@ -18,6 +18,7 @@ import { DealerMessages } from './dealer/DealerMessages'
 import { DealerOffers } from './dealer/DealerOffers'
 import { DealerOverview } from './dealer/DealerOverview'
 import { DealerProfile } from './dealer/DealerProfile'
+import { DealerRentals } from './dealer/DealerRentals'
 import { DealerSubscription } from './dealer/DealerSubscription'
 import { LenderApplications } from './lender/LenderApplications'
 import { LenderLayout } from './lender/LenderLayout'
@@ -59,6 +60,7 @@ export default function App() {
         <Route path="dealer" element={<DealerLayout />}>
           <Route index element={<DealerOverview />} />
           <Route path="inventory" element={<DealerInventory />} />
+          <Route path="rentals" element={<DealerRentals />} />
           <Route path="enquiries" element={<DealerEnquiries />} />
           <Route path="offers" element={<DealerOffers />} />
           <Route path="messages" element={<DealerMessages />} />

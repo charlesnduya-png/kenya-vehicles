@@ -17,12 +17,13 @@ import { dealers } from '../data/dealers'
 import { subscribeEnquiries } from '../data/enquiries'
 import { loanPartners } from '../data/loans'
 import { subscribeOffers } from '../data/offers'
-import { rentalCars, rentalOwners } from '../data/rentals'
+import { dealersWithRentals, getRentals } from '../data/rentals'
 
 export function AdminOverview() {
   const [tick, setTick] = useState(0)
   const liveListings = cars.length
-  const liveRentals = rentalCars.filter((r) => r.available).length
+  const fleet = getRentals()
+  const liveRentals = fleet.filter((r) => r.available).length
   const activeAccounts = adminAccounts.filter((a) => a.status === 'Active').length
   const openEnquiries = adminEnquiries.filter((e) => e.status !== 'Closed').length
   const inventoryValue = cars.reduce((sum, c) => sum + c.price, 0)
@@ -83,9 +84,9 @@ export function AdminOverview() {
           <em>{dealers.filter((d) => d.verified).length} verified</em>
         </article>
         <article className="admin-kpi">
-          <span>Rental partners</span>
-          <strong>{rentalOwners.length}</strong>
-          <em>{rentalCars.length} hire cars</em>
+          <span>Dealers with rentals</span>
+          <strong>{dealersWithRentals().length}</strong>
+          <em>{fleet.length} hire cars listed</em>
         </article>
         <article className="admin-kpi">
           <span>Loan partners</span>

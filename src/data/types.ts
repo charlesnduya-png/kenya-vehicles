@@ -58,20 +58,10 @@ export interface LoanPartner {
   logo?: string
 }
 
-export interface RentalOwner {
-  id: string
-  name: string
-  city: string
-  phone: string
-  verified: boolean
-  rating: number
-  reviewCount: number
-  carsListed: number
-}
-
 export interface RentalCar {
   id: string
-  ownerId: string
+  /** Dealer yard that lists this hire car */
+  dealerId: string
   make: string
   model: string
   year: number

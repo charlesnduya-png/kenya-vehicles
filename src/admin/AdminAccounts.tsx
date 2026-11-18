@@ -99,7 +99,6 @@ export function AdminAccounts() {
             <option>Buyer</option>
             <option>Dealer</option>
             <option>Agent</option>
-            <option>Rental partner</option>
             <option>Loan partner</option>
             <option>Admin</option>
           </select>

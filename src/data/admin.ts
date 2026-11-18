@@ -2,7 +2,6 @@ export type AccountRole =
   | 'Buyer'
   | 'Dealer'
   | 'Agent'
-  | 'Rental partner'
   | 'Loan partner'
   | 'Admin'
 
@@ -76,28 +75,6 @@ export const adminAccounts: AdminAccount[] = [
     lastActive: '2026-03-16',
     plan: 'Growth',
     billingStatus: 'Active',
-  },
-  {
-    id: 'u4',
-    name: 'Safari Wheels Hire',
-    email: 'book@safariwheels.co.ke',
-    phone: '+254 711 220 330',
-    role: 'Rental partner',
-    status: 'Active',
-    city: 'Nairobi',
-    joined: '2025-02-10',
-    lastActive: '2026-03-17',
-  },
-  {
-    id: 'u5',
-    name: 'Coast Ride Rentals',
-    email: 'ops@coastride.co.ke',
-    phone: '+254 722 440 550',
-    role: 'Rental partner',
-    status: 'Active',
-    city: 'Mombasa',
-    joined: '2025-04-22',
-    lastActive: '2026-03-15',
   },
   {
     id: 'u6',
@@ -219,17 +196,6 @@ export const adminAccounts: AdminAccount[] = [
     city: 'Nairobi',
     joined: '2024-01-01',
     lastActive: '2026-03-17',
-  },
-  {
-    id: 'u11',
-    name: 'Rift Self Drive',
-    email: 'hire@riftselfdrive.co.ke',
-    phone: '+254 733 660 770',
-    role: 'Rental partner',
-    status: 'Suspended',
-    city: 'Nakuru',
-    joined: '2025-06-30',
-    lastActive: '2026-02-28',
   },
   {
     id: 'u12',

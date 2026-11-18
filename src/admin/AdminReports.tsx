@@ -45,7 +45,7 @@ export function AdminReports() {
         <div>
           <h2>Account reports</h2>
           <p style={{ margin: '0.2rem 0 0', color: '#64748b', fontSize: '0.85rem' }}>
-            Customer reports against dealers, agents, and rental partners
+            Customer reports against dealers and other accounts
           </p>
         </div>
         <div className="admin-toolbar-actions">

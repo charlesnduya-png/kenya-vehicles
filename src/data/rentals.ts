@@ -1,52 +1,13 @@
-import type { RentalCar, RentalOwner } from './types'
+import { getDealer } from './dealers'
+import type { BodyType, RentalCar } from './types'
 
-export const rentalOwners: RentalOwner[] = [
-  {
-    id: 'ro1',
-    name: 'Safari Wheels Hire',
-    city: 'Nairobi',
-    phone: '+254 711 220 330',
-    verified: true,
-    rating: 4.8,
-    reviewCount: 126,
-    carsListed: 14,
-  },
-  {
-    id: 'ro2',
-    name: 'Coast Ride Rentals',
-    city: 'Mombasa',
-    phone: '+254 722 440 550',
-    verified: true,
-    rating: 4.6,
-    reviewCount: 89,
-    carsListed: 9,
-  },
-  {
-    id: 'ro3',
-    name: 'Rift Self Drive',
-    city: 'Nakuru',
-    phone: '+254 733 660 770',
-    verified: true,
-    rating: 4.7,
-    reviewCount: 54,
-    carsListed: 7,
-  },
-  {
-    id: 'ro4',
-    name: 'CityGo Car Hire',
-    city: 'Nairobi',
-    phone: '+254 701 880 990',
-    verified: false,
-    rating: 4.3,
-    reviewCount: 31,
-    carsListed: 5,
-  },
-]
+const STORAGE_KEY = 'kv-rental-cars'
+const EVENT = 'kv-rentals-changed'
 
-export const rentalCars: RentalCar[] = [
+const seed: RentalCar[] = [
   {
     id: 'r1',
-    ownerId: 'ro1',
+    dealerId: 'd1',
     make: 'Toyota',
     model: 'Axio',
     year: 2016,
@@ -72,7 +33,7 @@ export const rentalCars: RentalCar[] = [
   },
   {
     id: 'r2',
-    ownerId: 'ro1',
+    dealerId: 'd1',
     make: 'Toyota',
     model: 'Harrier',
     year: 2017,
@@ -98,7 +59,7 @@ export const rentalCars: RentalCar[] = [
   },
   {
     id: 'r3',
-    ownerId: 'ro2',
+    dealerId: 'd2',
     make: 'Toyota',
     model: 'Hilux',
     year: 2018,
@@ -124,7 +85,7 @@ export const rentalCars: RentalCar[] = [
   },
   {
     id: 'r4',
-    ownerId: 'ro3',
+    dealerId: 'd4',
     make: 'Subaru',
     model: 'Forester',
     year: 2016,
@@ -150,7 +111,7 @@ export const rentalCars: RentalCar[] = [
   },
   {
     id: 'r5',
-    ownerId: 'ro4',
+    dealerId: 'd6',
     make: 'Toyota',
     model: 'Vitz',
     year: 2015,
@@ -176,7 +137,7 @@ export const rentalCars: RentalCar[] = [
   },
   {
     id: 'r6',
-    ownerId: 'ro2',
+    dealerId: 'd2',
     make: 'Toyota',
     model: 'Hiace',
     year: 2017,
@@ -202,7 +163,7 @@ export const rentalCars: RentalCar[] = [
   },
   {
     id: 'r7',
-    ownerId: 'ro1',
+    dealerId: 'd1',
     make: 'Toyota',
     model: 'Premio',
     year: 2017,
@@ -228,7 +189,7 @@ export const rentalCars: RentalCar[] = [
   },
   {
     id: 'r8',
-    ownerId: 'ro3',
+    dealerId: 'd4',
     make: 'Toyota',
     model: 'Probox',
     year: 2015,
@@ -254,10 +215,129 @@ export const rentalCars: RentalCar[] = [
   },
 ]
 
-export function getRental(id: string) {
-  return rentalCars.find((r) => r.id === id)
+function migrate(list: RentalCar[]): RentalCar[] {
+  return list.map((r) => {
+    const anyR = r as RentalCar & { ownerId?: string }
+    if (anyR.dealerId) return anyR
+    const legacy: Record<string, string> = {
+      ro1: 'd1',
+      ro2: 'd2',
+      ro3: 'd4',
+      ro4: 'd6',
+    }
+    return { ...anyR, dealerId: legacy[anyR.ownerId ?? ''] ?? 'd1' }
+  })
 }
 
-export function getRentalOwner(id: string) {
-  return rentalOwners.find((o) => o.id === id)
+function read(): RentalCar[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(seed))
+      return seed.map((r) => ({ ...r }))
+    }
+    return migrate(JSON.parse(raw) as RentalCar[])
+  } catch {
+    return seed.map((r) => ({ ...r }))
+  }
+}
+
+function write(list: RentalCar[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
+  window.dispatchEvent(new Event(EVENT))
+}
+
+/** Live hire fleet (dealers list these) */
+export function getRentals() {
+  return read().sort((a, b) => Number(b.featured) - Number(a.featured) || a.make.localeCompare(b.make))
+}
+
+/** @deprecated use getRentals() — kept for older imports */
+export const rentalCars = seed
+
+export function getRental(id: string) {
+  return read().find((r) => r.id === id)
+}
+
+export function getRentalsByDealer(dealerId: string) {
+  return getRentals().filter((r) => r.dealerId === dealerId)
+}
+
+export function dealersWithRentals() {
+  const ids = new Set(getRentals().map((r) => r.dealerId))
+  return [...ids].map((id) => getDealer(id)).filter(Boolean)
+}
+
+export type NewRentalInput = {
+  dealerId: string
+  make: string
+  model: string
+  year: number
+  pricePerDay: number
+  pricePerWeek: number
+  deposit: number
+  transmission: 'Automatic' | 'Manual'
+  fuel: 'Petrol' | 'Diesel' | 'Hybrid' | 'Electric'
+  bodyType: BodyType
+  seats: number
+  city: string
+  county: string
+  withDriver: boolean
+  selfDrive: boolean
+  description: string
+  includes?: string[]
+  images?: string[]
+}
+
+export function addRental(input: NewRentalInput) {
+  const list = read()
+  const rental: RentalCar = {
+    id: `r-${Date.now()}`,
+    dealerId: input.dealerId,
+    make: input.make.trim(),
+    model: input.model.trim(),
+    year: input.year,
+    pricePerDay: input.pricePerDay,
+    pricePerWeek: input.pricePerWeek,
+    deposit: input.deposit,
+    transmission: input.transmission,
+    fuel: input.fuel,
+    bodyType: input.bodyType,
+    seats: input.seats,
+    city: input.city.trim(),
+    county: input.county.trim(),
+    withDriver: input.withDriver,
+    selfDrive: input.selfDrive,
+    featured: false,
+    available: true,
+    images:
+      input.images && input.images.length > 0
+        ? input.images
+        : [
+            'https://upload.wikimedia.org/wikipedia/commons/5/55/2016_Toyota_Corolla_Axio_Hybrid_sedan_front.jpg',
+          ],
+    description: input.description.trim() || `${input.year} ${input.make} ${input.model} for hire.`,
+    includes: input.includes?.length
+      ? input.includes
+      : ['Comprehensive insurance', 'Kenya Vehicles booking'],
+  }
+  write([rental, ...list])
+  return rental
+}
+
+export function setRentalAvailable(id: string, available: boolean) {
+  const list = read()
+  const row = list.find((r) => r.id === id)
+  if (!row) return
+  row.available = available
+  write(list)
+}
+
+export function subscribeRentals(listener: () => void) {
+  window.addEventListener(EVENT, listener)
+  window.addEventListener('storage', listener)
+  return () => {
+    window.removeEventListener(EVENT, listener)
+    window.removeEventListener('storage', listener)
+  }
 }

@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { RentalCard } from '../components/RentalCard'
-import { rentalCars } from '../data/rentals'
+import { getRentals, subscribeRentals } from '../data/rentals'
 import type { BodyType } from '../data/types'
 import './Browse.css'
 import './Rentals.css'
@@ -23,9 +23,12 @@ export function Rentals() {
   const [bodyType, setBodyType] = useState<BodyType | 'All'>('All')
   const [drive, setDrive] = useState<'All' | 'Self-drive' | 'With driver'>('All')
   const [availableOnly, setAvailableOnly] = useState(true)
+  const [fleet, setFleet] = useState(() => getRentals())
+
+  useEffect(() => subscribeRentals(() => setFleet(getRentals())), [])
 
   const filtered = useMemo(() => {
-    return rentalCars.filter((car) => {
+    return fleet.filter((car) => {
       const hay = `${car.make} ${car.model} ${car.city}`.toLowerCase()
       const matchesQ = !q || hay.includes(q.toLowerCase())
       const matchesCity = city === 'All' || car.city === city
@@ -37,7 +40,7 @@ export function Rentals() {
       const matchesAvail = !availableOnly || car.available
       return matchesQ && matchesCity && matchesBody && matchesDrive && matchesAvail
     })
-  }, [q, city, bodyType, drive, availableOnly])
+  }, [fleet, q, city, bodyType, drive, availableOnly])
 
   return (
     <section className="section browse rentals-page">
@@ -52,12 +55,12 @@ export function Rentals() {
           <div>
             <h1>Hire a car in Kenya</h1>
             <p>
-              Browse cars from verified rental partners — self-drive or with a driver. Book daily
-              or weekly from Nairobi, Mombasa, Nakuru and more.
+              Browse hire cars listed by dealers — self-drive or with a driver. Book daily or weekly
+              from Nairobi, Mombasa, Nakuru and more.
             </p>
           </div>
-          <Link to="/join#rentals" className="btn btn-primary">
-            List your rental car
+          <Link to="/login?next=/dealer/rentals" className="btn btn-primary">
+            Dealer: list a hire car
           </Link>
         </div>
 

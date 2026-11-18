@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ReportAccountModal } from '../components/ReportAccountModal'
 import { dealers } from '../data/dealers'
-import { rentalOwners } from '../data/rentals'
 import type { ReportTargetType } from '../data/reports'
 import './ReportAccount.css'
 
@@ -15,20 +14,13 @@ type TargetOption = {
 
 export function ReportAccount() {
   const options = useMemo<TargetOption[]>(
-    () => [
-      ...dealers.map((d) => ({
+    () =>
+      dealers.map((d) => ({
         id: d.id,
         name: d.name,
         type: 'Dealer' as const,
         meta: `${d.city} · Dealer`,
       })),
-      ...rentalOwners.map((o) => ({
-        id: o.id,
-        name: o.name,
-        type: 'Rental partner' as const,
-        meta: `${o.city} · Rental partner`,
-      })),
-    ],
     [],
   )
 
@@ -36,8 +28,7 @@ export function ReportAccount() {
     () => (options[0] ? `${options[0].type}:${options[0].id}` : ''),
   )
   const [open, setOpen] = useState(false)
-  const selected =
-    options.find((o) => `${o.type}:${o.id}` === selectedKey) ?? options[0]
+  const selected = options.find((o) => `${o.type}:${o.id}` === selectedKey) ?? options[0]
 
   return (
     <section className="section report-page">
@@ -52,8 +43,8 @@ export function ReportAccount() {
           <p className="eyebrow">Trust &amp; safety</p>
           <h1>Report an account</h1>
           <p>
-            Tell us about a dealer, rental partner, or other Kenya Vehicles account that may be
-            breaking our rules. Our team reviews every report.
+            Tell us about a dealer or other Kenya Vehicles account that may be breaking our rules.
+            Our team reviews every report.
           </p>
 
           <div className="field" style={{ marginTop: '1.25rem' }}>
@@ -78,7 +69,7 @@ export function ReportAccount() {
             disabled={!selected}
             onClick={() => setOpen(true)}
           >
-            Continue to report
+            Continue
           </button>
         </div>
       </div>

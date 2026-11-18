@@ -3,14 +3,15 @@ import { Link, useParams } from 'react-router-dom'
 import { ReportAccountModal } from '../components/ReportAccountModal'
 import { VerifiedBadge } from '../components/VerifiedBadge'
 import { formatKES } from '../data/cars'
-import { getRental, getRentalOwner } from '../data/rentals'
+import { getDealer } from '../data/dealers'
+import { getRental } from '../data/rentals'
 import './CarDetail.css'
 import './RentalDetail.css'
 
 export function RentalDetail() {
   const { id } = useParams()
   const rental = getRental(id ?? '')
-  const owner = rental ? getRentalOwner(rental.ownerId) : undefined
+  const dealer = rental ? getDealer(rental.dealerId) : undefined
   const [days, setDays] = useState(3)
   const [withDriver, setWithDriver] = useState(false)
   const [sent, setSent] = useState(false)
@@ -25,7 +26,7 @@ export function RentalDetail() {
     return Math.round(dayTotal - weekDiscount + driverFee)
   }, [rental, days, withDriver])
 
-  if (!rental || !owner) {
+  if (!rental || !dealer) {
     return (
       <section className="section container">
         <h1>Rental not found</h1>
@@ -87,7 +88,9 @@ export function RentalDetail() {
               {formatKES(rental.pricePerDay)}
               <span className="rental-per"> / day</span>
             </p>
-            <p className="rental-week">Week from {formatKES(rental.pricePerWeek)} · Deposit {formatKES(rental.deposit)}</p>
+            <p className="rental-week">
+              Week from {formatKES(rental.pricePerWeek)} · Deposit {formatKES(rental.deposit)}
+            </p>
 
             <div className="detail-chips">
               <span className="badge badge-muted">{rental.bodyType}</span>
@@ -108,13 +111,13 @@ export function RentalDetail() {
 
             <div className="dealer-box">
               <div>
-                <p className="dealer-box-label">Offered by</p>
-                <strong className="with-verified">
-                  <span>{owner.name}</span>
-                  {owner.verified && <VerifiedBadge title="Verified rental partner" size={15} />}
-                </strong>
+                <p className="dealer-box-label">Listed by dealer</p>
+                <Link to={`/dealers/${dealer.id}`} className="with-verified">
+                  <strong>{dealer.name}</strong>
+                  {dealer.verified && <VerifiedBadge title="Verified dealer" size={15} />}
+                </Link>
                 <p>
-                  {owner.city} · ★ {owner.rating} ({owner.reviewCount})
+                  {dealer.city} · ★ {dealer.rating} ({dealer.reviewCount})
                 </p>
                 <button
                   type="button"
@@ -122,11 +125,11 @@ export function RentalDetail() {
                   style={{ marginTop: '0.45rem' }}
                   onClick={() => setReportOpen(true)}
                 >
-                  Report this partner
+                  Report this seller
                 </button>
               </div>
-              <a href={`tel:${owner.phone.replace(/\s/g, '')}`} className="btn btn-primary">
-                Call owner
+              <a href={`tel:${dealer.phone.replace(/\s/g, '')}`} className="btn btn-primary">
+                Call dealer
               </a>
             </div>
           </div>
@@ -134,11 +137,11 @@ export function RentalDetail() {
 
         <form className="rental-book panel-card" onSubmit={onBook}>
           <h2>Request a hire</h2>
-          <p>Send a booking request to {owner.name}. They will confirm availability and pickup.</p>
+          <p>Send a booking request to {dealer.name}. They will confirm availability and pickup.</p>
 
           {sent ? (
             <div className="enquire-success">
-              Hire request sent. The owner typically replies within a few hours.
+              Hire request sent. The dealer typically replies within a few hours.
             </div>
           ) : (
             <>
@@ -204,9 +207,9 @@ export function RentalDetail() {
       <ReportAccountModal
         open={reportOpen}
         onClose={() => setReportOpen(false)}
-        targetType="Rental partner"
-        targetId={owner.id}
-        targetName={owner.name}
+        targetType="Dealer"
+        targetId={dealer.id}
+        targetName={dealer.name}
         relatedListing={`${rental.year} ${rental.make} ${rental.model} hire`}
       />
     </section>

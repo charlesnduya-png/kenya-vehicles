@@ -18,6 +18,7 @@ const groups = [
     items: [
       { to: '/dealer', label: 'Overview', end: true, icon: 'grid' },
       { to: '/dealer/inventory', label: 'Inventory', icon: 'car' },
+      { to: '/dealer/rentals', label: 'Rentals', icon: 'key' },
       { to: '/dealer/enquiries', label: 'Enquiries', icon: 'inbox' },
       { to: '/dealer/offers', label: 'Offers', icon: 'tag' },
       { to: '/dealer/messages', label: 'Messages', icon: 'chat' },
@@ -35,6 +36,7 @@ const groups = [
 const titles: Record<string, { eyebrow: string; title: string }> = {
   '/dealer': { eyebrow: 'Dealer portal', title: 'Yard overview' },
   '/dealer/inventory': { eyebrow: 'Stock', title: 'Your inventory' },
+  '/dealer/rentals': { eyebrow: 'Hire fleet', title: 'Car rentals' },
   '/dealer/enquiries': { eyebrow: 'Pipeline', title: 'Buyer enquiries' },
   '/dealer/offers': { eyebrow: 'Pipeline', title: 'Customer offers' },
   '/dealer/messages': { eyebrow: 'Inbox', title: 'Customer messages' },
@@ -71,6 +73,14 @@ function NavIcon({ name }: { name: string }) {
           <path d="M7 10l1.2-3h7.6L17 10" />
           <circle cx="7.5" cy="16.5" r="1.5" />
           <circle cx="16.5" cy="16.5" r="1.5" />
+        </svg>
+      )
+    case 'key':
+      return (
+        <svg {...common}>
+          <circle cx="8" cy="14" r="3" />
+          <path d="M10.5 12.5L19 4l2 2-2 2" />
+          <path d="M15 8l2 2" />
         </svg>
       )
     case 'inbox':

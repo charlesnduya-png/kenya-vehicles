@@ -128,6 +128,9 @@ export function DealerOverview() {
             <Link to="/dealer/inventory" className="admin-btn admin-btn-primary">
               Manage inventory
             </Link>
+            <Link to="/dealer/rentals" className="admin-btn admin-btn-ghost">
+              List hire / rental cars
+            </Link>
             <Link to="/dealer/enquiries" className="admin-btn admin-btn-ghost">
               Review buyer enquiries
               {newEnquiries > 0 ? ` (${newEnquiries} new)` : ''}

@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
 import { formatKES } from '../data/cars'
-import { getRentalOwner } from '../data/rentals'
+import { getDealer } from '../data/dealers'
 import type { RentalCar } from '../data/types'
 import { VerifiedBadge } from './VerifiedBadge'
 import './CarCard.css'
 
 export function RentalCard({ rental }: { rental: RentalCar }) {
-  const owner = getRentalOwner(rental.ownerId)
+  const dealer = getDealer(rental.dealerId)
 
   return (
     <article className="shop-card">
@@ -22,8 +22,12 @@ export function RentalCard({ rental }: { rental: RentalCar }) {
 
       <div className="shop-card-body">
         <p className="shop-vendor with-verified">
-          <span>{owner?.name ?? 'Rental partner'}</span>
-          {owner?.verified && <VerifiedBadge title="Verified rental partner" size={14} />}
+          {dealer ? (
+            <Link to={`/dealers/${dealer.id}`}>{dealer.name}</Link>
+          ) : (
+            <span>Dealer</span>
+          )}
+          {dealer?.verified && <VerifiedBadge title="Verified dealer" size={14} />}
         </p>
         <h3>
           <Link to={`/rentals/${rental.id}`}>
